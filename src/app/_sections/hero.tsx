@@ -55,12 +55,16 @@ export function Hero() {
 
         <motion.div variants={rise} className="mt-10 flex flex-col gap-3 sm:flex-row">
           <Button size="lg" asChild>
-            <a href="#demo">Calculate your chart</a>
+            <a href="#demo">Generate Birth Chart</a>
           </Button>
           <Button size="lg" variant="outline" asChild>
-            <a href="#features">How it works</a>
+            <a href="#how-it-works">How it works</a>
           </Button>
         </motion.div>
+
+        <motion.p variants={rise} className="mt-6 text-xs text-muted-foreground/70">
+          Takes less than a minute — no account required to preview.
+        </motion.p>
       </motion.div>
     </section>
   );

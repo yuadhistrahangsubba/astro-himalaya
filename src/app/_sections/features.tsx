@@ -33,7 +33,7 @@ export function Features() {
         transition={{ type: "spring", stiffness: 110, damping: 16 }}
         className="text-center font-serif text-3xl italic sm:text-4xl"
       >
-        How it works
+        What you get
       </motion.h2>
 
       <div className="mt-16 grid gap-8 sm:grid-cols-3">

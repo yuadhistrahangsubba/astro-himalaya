@@ -4,8 +4,9 @@ import { ChartWheel } from "@/components/marketing/chart-wheel";
 import { Button } from "@/components/ui/button";
 
 const LINKS = [
-  { href: "#features", label: "How it works" },
-  { href: "#demo", label: "Try a chart" },
+  { href: "#how-it-works", label: "How it works" },
+  { href: "#pricing", label: "Pricing" },
+  { href: "#faq", label: "FAQ" },
 ] as const;
 
 export function Navbar() {
