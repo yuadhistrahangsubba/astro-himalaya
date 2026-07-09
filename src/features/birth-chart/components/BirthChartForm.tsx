@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { computeChart } from "@/services/astrology";
+import { computeChart, type ChartResult } from "@/services/astrology";
 
 import { birthChartSchema, type BirthChartFormValues } from "../schema";
 import { useBirthChartWizard } from "../store";
@@ -16,6 +16,7 @@ import { useBirthChartWizard } from "../store";
 export function BirthChartForm() {
   const setDraft = useBirthChartWizard((s) => s.setDraft);
   const [engineMessage, setEngineMessage] = useState<string | null>(null);
+  const [result, setResult] = useState<ChartResult | null>(null);
 
   const {
     register,
@@ -29,14 +30,16 @@ export function BirthChartForm() {
   async function onSubmit(values: BirthChartFormValues) {
     setDraft(values);
     setEngineMessage(null);
+    setResult(null);
     try {
-      await computeChart({
+      const chart = computeChart({
         birthDate: values.birthDate,
         birthTime: values.birthTime || undefined,
         timezone: values.timezone,
         latitude: values.latitude,
         longitude: values.longitude,
       });
+      setResult(chart);
     } catch (err) {
       setEngineMessage(err instanceof Error ? err.message : "Something went wrong.");
     }
@@ -98,11 +101,40 @@ export function BirthChartForm() {
           </div>
         )}
 
+        {result && <ChartSummary result={result} />}
+
         <Button type="submit" disabled={isSubmitting} className="mt-1 w-full">
           {isSubmitting ? <Loader2 className="animate-spin" /> : <Sparkles />}
           Calculate chart
         </Button>
       </form>
+    </div>
+  );
+}
+
+function ChartSummary({ result }: { result: ChartResult }) {
+  return (
+    <div className="grid gap-1.5 rounded-md border border-border bg-secondary/40 p-3 text-sm">
+      <p>
+        <span className="text-muted-foreground">Sun:</span> {result.sun.rashi.signName} ·{" "}
+        {result.sun.nakshatra.name}
+      </p>
+      <p>
+        <span className="text-muted-foreground">Moon:</span> {result.moon.rashi.signName} ·{" "}
+        {result.moon.nakshatra.name}
+      </p>
+      {result.ascendant ? (
+        <p>
+          <span className="text-muted-foreground">Ascendant:</span> {result.ascendant.rashi.signName}
+        </p>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          Ascendant needs an exact birth time — add one above to see it.
+        </p>
+      )}
+      <p className="text-xs text-muted-foreground">
+        Mercury through Pluto aren&apos;t placed yet — this engine only has verified Sun/Moon positions so far.
+      </p>
     </div>
   );
 }

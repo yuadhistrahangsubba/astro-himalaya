@@ -19,9 +19,9 @@ export function BirthChartPreview() {
           <p className="font-dense text-xs tracking-[0.2em] text-gold uppercase">Birth chart preview</p>
           <h2 className="mt-4 font-serif text-3xl italic sm:text-4xl">See your chart take shape</h2>
           <p className="mt-4 max-w-sm text-muted-foreground">
-            The calculation engine isn&apos;t connected yet — this form
-            validates and submits real, typed input, so you can see the
-            intended flow end to end before the engine is wired up.
+            Sun, Moon, and Ascendant are calculated for real — sidereal
+            positions, nakshatra, and planetary periods included. Mercury
+            through Pluto aren&apos;t wired up yet.
           </p>
           <p className="mt-6 text-xs text-muted-foreground/70">
             Hover a planet — this wheel is illustrative, not your real chart.
