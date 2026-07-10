@@ -21,7 +21,7 @@ export function AuroraLayer() {
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[-4] overflow-hidden">
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
       {BLOBS.map((blob, i) => (
         <motion.div
           key={i}

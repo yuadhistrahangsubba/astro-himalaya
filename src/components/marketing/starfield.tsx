@@ -37,7 +37,15 @@ export function Starfield() {
   );
 
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[-3] overflow-hidden">
+    // The outer div fills its parallax wrapper; the inner motion.div adds
+    // a near-imperceptible whole-field drift (the sky itself turning) on
+    // top of the per-star twinkle — one extra transform, not 60.
+    <motion.div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0"
+      animate={reducedMotion ? undefined : { y: [0, -10], x: [0, 6] }}
+      transition={{ type: "spring", stiffness: 2, damping: 3, repeat: Infinity, repeatType: "mirror" }}
+    >
       {stars.map((star, i) => (
         <motion.span
           key={i}
@@ -59,6 +67,6 @@ export function Starfield() {
           }
         />
       ))}
-    </div>
+    </motion.div>
   );
 }

@@ -44,7 +44,7 @@ export function FloatingParticles() {
   if (reducedMotion) return null;
 
   return (
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[-2] overflow-hidden">
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
       {particles.map((p, i) => (
         <motion.span
           key={i}

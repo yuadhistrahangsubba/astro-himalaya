@@ -54,7 +54,7 @@ export function Hero() {
         </motion.p>
 
         <motion.div variants={rise} className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <Button size="lg" asChild>
+          <Button size="lg" breathing asChild>
             <a href="#demo">Generate Birth Chart</a>
           </Button>
           <Button size="lg" variant="outline" asChild>

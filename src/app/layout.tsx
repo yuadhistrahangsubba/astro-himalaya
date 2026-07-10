@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google";
 import { CosmicBackground } from "@/components/marketing/cosmic-background";
-import { Navbar } from "@/components/marketing/navbar";
-import { Footer } from "@/components/marketing/footer";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import "./globals.css";
@@ -55,9 +53,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <QueryProvider>
             <CosmicBackground />
-            <Navbar />
             {children}
-            <Footer />
           </QueryProvider>
         </ThemeProvider>
       </body>

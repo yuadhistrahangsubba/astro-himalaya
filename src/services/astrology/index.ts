@@ -10,9 +10,9 @@ import { PlanetNotSupportedError } from "./errors";
 import type { CelestialBody } from "./ephemeris/types";
 import { MeeusEphemerisProvider } from "./ephemeris/provider";
 import { calculateMoonPhase } from "./moon-phase";
-import type { BirthInput, BodyPlacement, ChartResult } from "./types";
+import { placeBody } from "./placements";
+import type { BirthInput, ChartResult } from "./types";
 import { calculateVimshottariDasha } from "./vedic/dasha";
-import { nakshatraFromSiderealLongitude } from "./vedic/nakshatra";
 import { calculatePanchang } from "./vedic/panchang";
 import { rashiFromSiderealLongitude } from "./vedic/rashi";
 import { tropicalZodiacSign } from "./western/zodiac-sign";
@@ -32,17 +32,6 @@ const OUTER_BODIES: readonly CelestialBody[] = [
 ];
 
 const ephemeris = new MeeusEphemerisProvider();
-
-function placeBody(tropicalLongitude: number, ayanamsaDegrees: number): BodyPlacement {
-  const siderealLongitude = normalizeDegrees(tropicalLongitude - ayanamsaDegrees);
-  return {
-    tropicalLongitude,
-    siderealLongitude,
-    rashi: rashiFromSiderealLongitude(siderealLongitude),
-    nakshatra: nakshatraFromSiderealLongitude(siderealLongitude),
-    westernSign: tropicalZodiacSign(tropicalLongitude),
-  };
-}
 
 /**
  * Computes what this engine can currently place for real: Sun, Moon,

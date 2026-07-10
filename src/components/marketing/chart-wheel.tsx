@@ -128,11 +128,19 @@ export function ChartWheel({ size = "lg", className }: ChartWheelProps) {
           const pos = polar(planet.angle, planet.radius);
           const isActive = active === i;
           return (
-            <g
+            // The outer group swings the whole planet (dot + glyph +
+            // tooltip anchor) along its ring into final position — a
+            // rotation about the wheel's center, so the motion follows
+            // the orbit's arc rather than a straight line.
+            <motion.g
               key={planet.name}
               onMouseEnter={() => setActive(i)}
               onMouseLeave={() => setActive(null)}
               className="cursor-pointer"
+              initial={reducedMotion ? false : { rotate: -28 }}
+              animate={{ rotate: 0 }}
+              transition={{ type: "spring", stiffness: 45, damping: 13, delay: 0.5 + i * 0.12 }}
+              style={{ transformOrigin: "200px 200px" }}
             >
               <motion.circle
                 cx={pos.x}
@@ -172,7 +180,7 @@ export function ChartWheel({ size = "lg", className }: ChartWheelProps) {
                   </motion.g>
                 )}
               </AnimatePresence>
-            </g>
+            </motion.g>
           );
         })}
 

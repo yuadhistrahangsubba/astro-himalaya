@@ -5,6 +5,7 @@ import { type VariantProps, cva } from "class-variance-authority";
 import { AnimatePresence, motion } from "motion/react";
 import { type ComponentProps, type MouseEvent, useRef, useState } from "react";
 
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 
 const MotionSlot = motion.create(Slot);
@@ -50,11 +51,35 @@ type NativeButtonProps = Omit<
 >;
 
 type ButtonProps = NativeButtonProps &
-  VariantProps<typeof buttonVariants> & { asChild?: boolean };
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean;
+    /** Idle glow pulse for the page's primary CTA — use on at most one or two buttons per view. */
+    breathing?: boolean;
+  };
 
-function Button({ className, variant, size, asChild = false, onClick, children, ...props }: ButtonProps) {
+/**
+ * Wraps a button in a slow, sub-2% scale pulse. Lives on a wrapper (not
+ * the button itself) so the idle rhythm never fights the snappy
+ * hover/press springs on the button's own scale.
+ */
+function BreatheWrapper({ enabled, children }: { enabled: boolean; children: React.ReactNode }) {
+  if (!enabled) return <>{children}</>;
+  return (
+    <motion.span
+      className="inline-block"
+      animate={{ scale: [1, 1.018] }}
+      transition={{ type: "spring", stiffness: 6, damping: 4, repeat: Infinity, repeatType: "mirror" }}
+    >
+      {children}
+    </motion.span>
+  );
+}
+
+function Button({ className, variant, size, asChild = false, breathing = false, onClick, children, ...props }: ButtonProps) {
   const [ripples, setRipples] = useState<Ripple[]>([]);
   const rippleId = useRef(0);
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const breathe = breathing && !reducedMotion;
 
   const sharedProps = {
     "data-slot": "button",
@@ -69,9 +94,11 @@ function Button({ className, variant, size, asChild = false, onClick, children, 
   // caller's element untouched (lift/glow still apply to it via style).
   if (asChild) {
     return (
-      <MotionSlot {...sharedProps} onClick={onClick} {...props}>
-        {children}
-      </MotionSlot>
+      <BreatheWrapper enabled={breathe}>
+        <MotionSlot {...sharedProps} onClick={onClick} {...props}>
+          {children}
+        </MotionSlot>
+      </BreatheWrapper>
     );
   }
 
@@ -86,24 +113,26 @@ function Button({ className, variant, size, asChild = false, onClick, children, 
   }
 
   return (
-    <motion.button {...sharedProps} onClick={handleClick} {...props}>
-      {children}
-      <AnimatePresence>
-        {ripples.map((r) => (
-          <motion.span
-            key={r.id}
-            className="absolute rounded-full bg-white/40"
-            style={{ left: r.x, top: r.y, width: 8, height: 8, x: "-50%", y: "-50%" }}
-            initial={{ scale: 0, opacity: 0.6 }}
-            animate={{ scale: 22, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 60, damping: 20 }}
-            onAnimationComplete={() =>
-              setRipples((prev) => prev.filter((ripple) => ripple.id !== r.id))
-            }
-          />
-        ))}
-      </AnimatePresence>
-    </motion.button>
+    <BreatheWrapper enabled={breathe}>
+      <motion.button {...sharedProps} onClick={handleClick} {...props}>
+        {children}
+        <AnimatePresence>
+          {ripples.map((r) => (
+            <motion.span
+              key={r.id}
+              className="absolute rounded-full bg-white/40"
+              style={{ left: r.x, top: r.y, width: 8, height: 8, x: "-50%", y: "-50%" }}
+              initial={{ scale: 0, opacity: 0.6 }}
+              animate={{ scale: 22, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 60, damping: 20 }}
+              onAnimationComplete={() =>
+                setRipples((prev) => prev.filter((ripple) => ripple.id !== r.id))
+              }
+            />
+          ))}
+        </AnimatePresence>
+      </motion.button>
+    </BreatheWrapper>
   );
 }
 

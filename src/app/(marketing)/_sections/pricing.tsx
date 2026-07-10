@@ -4,13 +4,14 @@ import { Check } from "lucide-react";
 import { motion } from "motion/react";
 
 import { Button } from "@/components/ui/button";
+import { CountUp } from "@/components/marketing/count-up";
 import { GlassCard } from "@/components/marketing/glass-card";
 
 // Illustrative pricing — confirm real tiers/amounts before launch.
 const TIERS = [
   {
     name: "Starter",
-    price: "$0",
+    price: 0,
     tagline: "Explore your chart",
     features: ["1 birth profile", "Sidereal birth chart", "Basic planetary positions"],
     cta: "Get started",
@@ -18,7 +19,7 @@ const TIERS = [
   },
   {
     name: "Devoted",
-    price: "$9",
+    price: 9,
     tagline: "For real guidance",
     features: ["Everything in Starter", "Dasha timelines", "Downloadable reports", "Priority email support"],
     cta: "Start free trial",
@@ -26,7 +27,7 @@ const TIERS = [
   },
   {
     name: "Family",
-    price: "$19",
+    price: 19,
     tagline: "For the whole household",
     features: ["Everything in Devoted", "Up to 6 profiles", "Guna Milan matchmaking"],
     cta: "Get started",
@@ -40,7 +41,9 @@ function TierContent({ tier }: { tier: (typeof TIERS)[number] }) {
       <p className="font-serif text-xl">{tier.name}</p>
       <p className="mt-1 text-sm text-muted-foreground">{tier.tagline}</p>
       <p className="mt-5">
-        <span className="font-serif text-4xl">{tier.price}</span>
+        <span className="font-serif text-4xl">
+          <CountUp to={tier.price} prefix="$" />
+        </span>
         <span className="text-sm text-muted-foreground">/month</span>
       </p>
 
