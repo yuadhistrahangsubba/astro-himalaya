@@ -13,9 +13,12 @@
  */
 export function localToUtc(dateISO: string, time: string, timeZone: string): Date {
   const [year, month, day] = dateISO.split("-").map(Number) as [number, number, number];
-  const [hour, minute] = time.split(":").map(Number) as [number, number];
+  // "HH:mm" or "HH:mm:ss" — seconds are below what any placement needs
+  // (the fastest-moving angle, the ascendant, moves ~1° per 4 minutes),
+  // but if the user knows them, honor them rather than silently drop.
+  const [hour, minute, second = 0] = time.split(":").map(Number) as [number, number, number?];
 
-  const guessUtc = new Date(Date.UTC(year, month - 1, day, hour, minute));
+  const guessUtc = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
 
   const formatter = new Intl.DateTimeFormat("en-US", {
     timeZone,

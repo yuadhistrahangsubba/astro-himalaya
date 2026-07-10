@@ -22,4 +22,9 @@ describe("localToUtc", () => {
     const utc = localToUtc("2000-01-01", "05:30", "Asia/Kolkata");
     expect(utc.toISOString()).toBe("2000-01-01T00:00:00.000Z");
   });
+
+  it("honors optional seconds in HH:mm:ss input", () => {
+    const utc = localToUtc("1998-04-12", "12:00:45", "Asia/Thimphu");
+    expect(utc.toISOString()).toBe("1998-04-12T06:00:45.000Z");
+  });
 });
