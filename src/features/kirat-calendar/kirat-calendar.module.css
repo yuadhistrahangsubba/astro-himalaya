@@ -9,12 +9,6 @@
  * `.night` color block anymore.
  */
 
-.calendarRoot *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
 .calendarRoot{
     font-family:var(--font-sans), sans-serif;
     background:transparent;

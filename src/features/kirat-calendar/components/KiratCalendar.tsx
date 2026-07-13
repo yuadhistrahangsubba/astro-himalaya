@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { CosmicBackground } from "@/components/marketing/cosmic-background";
@@ -25,7 +26,10 @@ import { YearView } from "./YearView";
 const NIGHT_BG = "#0d0d14";
 const DAY_BG = "#f7f4ee";
 
+const INFO_PAGE_KEYS: InfoPageKey[] = ["about", "yamdhangsang", "festivals", "planets"];
+
 export function KiratCalendar() {
+  const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
   const [today, setToday] = useState(new Date());
   const [theme, setTheme] = useState<CalendarTheme>("day");
@@ -49,8 +53,15 @@ export function KiratCalendar() {
       setCurrentYear(now.getFullYear());
       setSelectedDate(now);
       setMounted(true);
+
+      // Deep link from another page's menu, e.g. /?panel=planets.
+      const panel = searchParams.get("panel");
+      if (INFO_PAGE_KEYS.includes(panel as InfoPageKey)) {
+        setViewMode(panel as InfoPageKey);
+      }
     }
     init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!mounted) return null;

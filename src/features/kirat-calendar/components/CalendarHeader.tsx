@@ -8,8 +8,8 @@ import type { InfoPageKey } from "../types";
 import { HamburgerMenu } from "./HamburgerMenu";
 
 interface CalendarHeaderProps {
-  onSelectHome: () => void;
-  onSelectInfoPage: (key: InfoPageKey) => void;
+  onSelectHome?: () => void;
+  onSelectInfoPage?: (key: InfoPageKey) => void;
 }
 
 export function CalendarHeader({ onSelectHome, onSelectInfoPage }: CalendarHeaderProps) {

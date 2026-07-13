@@ -9,8 +9,9 @@ import type { InfoPageKey } from "../types";
 interface HamburgerMenuProps {
   open: boolean;
   onClose: () => void;
-  onSelectHome: () => void;
-  onSelectInfoPage: (key: InfoPageKey) => void;
+  /** Omit on pages outside the calendar — Home/info items then navigate via real links instead of switching local view state. */
+  onSelectHome?: () => void;
+  onSelectInfoPage?: (key: InfoPageKey) => void;
 }
 
 const INFO_PAGES: { key: InfoPageKey; label: string }[] = [
@@ -46,29 +47,41 @@ export function HamburgerMenu({ open, onClose, onSelectHome, onSelectInfoPage }:
                 ✕
               </button>
             </div>
-            <button
-              type="button"
-              className={styles.menuLinkBtn}
-              onClick={() => {
-                onSelectHome();
-                onClose();
-              }}
-            >
-              🏠 Home
-            </button>
-            {INFO_PAGES.map((page) => (
+            {onSelectHome ? (
               <button
-                key={page.key}
                 type="button"
                 className={styles.menuLinkBtn}
                 onClick={() => {
-                  onSelectInfoPage(page.key);
+                  onSelectHome();
                   onClose();
                 }}
               >
-                {page.label}
+                🏠 Home
               </button>
-            ))}
+            ) : (
+              <Link href="/" className={styles.menuLinkBtn} onClick={onClose}>
+                🏠 Home
+              </Link>
+            )}
+            {INFO_PAGES.map((page) =>
+              onSelectInfoPage ? (
+                <button
+                  key={page.key}
+                  type="button"
+                  className={styles.menuLinkBtn}
+                  onClick={() => {
+                    onSelectInfoPage(page.key);
+                    onClose();
+                  }}
+                >
+                  {page.label}
+                </button>
+              ) : (
+                <Link key={page.key} href={`/?panel=${page.key}`} className={styles.menuLinkBtn} onClick={onClose}>
+                  {page.label}
+                </Link>
+              ),
+            )}
             <Link href="/astro" onClick={onClose}>
               🔭 Astro
             </Link>
