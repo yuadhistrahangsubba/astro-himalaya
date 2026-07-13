@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { CosmicBackground } from "@/components/marketing/cosmic-background";
 import { DashboardHeader } from "@/features/dashboard/components/dashboard-header";
 
 export const metadata: Metadata = {
@@ -11,6 +12,7 @@ export default function DashboardLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <>
+      <CosmicBackground />
       <DashboardHeader />
       {children}
     </>

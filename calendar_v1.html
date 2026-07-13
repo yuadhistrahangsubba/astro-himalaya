@@ -1,0 +1,2329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kirat Khaik Mundhum Calendar</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:sans-serif;
+    background:#fff8dc; /* Soft yellowish background */
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+header{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+
+    background:#FF9900; /* Bright Yellow */
+    color:#000;
+    padding:18px;
+
+    text-align:center;
+    z-index:10000;
+}
+
+.header-title{
+    text-align:center;
+	font-size:16px;
+	font-weight: bold;
+	color:#222222;
+}
+
+/* hamburger menu starts */
+.menu-container{
+    position:absolute;
+    left:15px;
+    top:15px;
+}
+
+.menu-btn{
+    background:none;
+    border:none;
+    color:white;
+    font-size:28px;
+    cursor:pointer;
+}
+
+/* Slide-in speed: tweak this one variable to make the menu faster/slower.
+   Lower value = faster slide, higher value = slower slide. */
+:root{
+    --menu-speed:0.7s;
+}
+
+.dropdown-menu{
+    position:fixed;
+
+    top:50px;
+    left:0;
+    text-align:left;
+
+    width:250px;
+	height: calc(100vh - 50px);
+
+    background:#fff9e6;
+    box-shadow:2px 0 10px rgba(0,0,0,.2);
+
+    overflow-y:auto;
+    z-index:99999;
+
+    transform:translateX(-100%);
+    transition:transform var(--menu-speed) cubic-bezier(.4,0,.2,1);
+}
+
+.dropdown-menu.open{
+    transform:translateX(0);
+}
+
+.dropdown-close-row{
+    display:flex;
+    justify-content:flex-end;
+    padding:10px 12px 4px 12px;
+}
+
+.menu-close-btn{
+    background:none;
+    border:none;
+    font-size:24px;
+    line-height:1;
+    color:#333;
+    cursor:pointer;
+    padding:4px 8px;
+}
+
+.menu-close-btn:hover{
+    opacity:0.7;
+}
+
+body.night-theme .menu-close-btn{
+    color:#e6e6f0;
+}
+
+.dropdown-menu a{
+    display:block;
+    padding:12px 15px;
+    color:#333;
+    text-decoration:none;
+    border-bottom:1px solid #e8dca8;
+}
+
+.dropdown-menu a:hover{
+    background:#fff4b8;
+}
+
+/* hamburger menu ends here */
+
+.container{
+    width:95%;
+    max-width:800px;
+    margin:80px auto 20px auto;
+}
+
+.today-info{
+    position:sticky;
+    top:90px;
+    z-index:9999;
+    background:#fff9e6;
+    padding:12px;
+    margin-bottom:15px;
+    border-radius:10px;
+    text-align:center;
+    font-weight:bold;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+.controls{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:5px;
+    flex-wrap:wrap;
+}
+
+.controls button{
+    padding:10px 15px;
+    border:none;
+    background:#1f2937;
+    color:#fff;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.controls button:hover{
+    opacity:0.9;
+}
+
+.controls select{
+    padding:10px;
+    border-radius:6px;
+    border:1px solid #d6c57a;
+    background:#fffef5;
+}
+
+.calendar{
+    background:#fffdf2;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 4px 15px rgba(0,0,0,.1);
+}
+
+.month-title{
+    background:#FF9900; /* Bright Yellow */
+    color:#000;
+    text-align:center;
+    padding:15px;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.weekdays{
+    display:grid;
+	font-family:'XenoType LIF Ilam';
+	text-align:center;
+    grid-template-columns:repeat(7,1fr);
+    background:#f7e7a9;
+}
+
+.weekdays div{
+    text-align:center;
+    padding:10px;
+    font-weight:bold;
+    color:#5b4a00;
+}
+
+.days{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+}
+
+.empty{
+    min-height:90px;
+    background:#fffdf2;
+}
+
+.day{
+    min-height:90px;
+    border:1px solid #efe3b5;
+    position:relative;
+    cursor:pointer;
+    background:#fffdf2;
+}
+
+.day:hover{
+    background:#fff4b8;
+}
+
+.ad-date{
+    position:absolute;
+    top:8px;
+    right:8px;
+    font-size:20px;
+    font-weight:bold;
+    color:#333;
+}
+
+/* TODAY CIRCLE */
+.today .ad-date{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:#2563eb;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.kirat-date{
+    position:absolute;
+    bottom:8px;
+    left:8px;
+    font-size:14px;
+    color:#2563eb;
+    font-weight:bold;
+}
+
+/* Container for both info boxes */
+
+.info-container{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    margin-top:20px;
+}
+
+/* Individual info boxes */
+
+.info-box{
+    flex:1;
+    background:#fff9e6;
+    padding:15px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+.today-location{
+    font-size:13px;
+    color:#666;
+    margin-top:4px;
+}
+
+/* Panchanga Details */
+
+.details-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+
+.details-table th{
+    border:1px solid #ddd;
+    color:#CC3300;
+    text-align:left;
+    padding:8px;
+    width:40%;
+    font-size:14px;
+	line-height:1.5;
+}
+
+.details-table td{
+    border:1px solid #ddd;
+	color:#CC6633;
+    padding:8px;
+    width:60%;
+    font-size:14px;
+	line-height:1.5;
+}
+
+.details-table tr:nth-child(even){
+    background:#fff8d6;
+}
+
+.details-table td p{
+    color:#999966;
+}
+
+/* Yenyem table Details */
+
+.yenyem-details-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+
+.yenyem-details-table th{
+    border:1px solid #ddd;
+    color:#CC3300;
+    text-align:left;
+    padding:8px;
+    font-size:14px;
+	line-height:1.2;
+}
+
+.yenyem-details-table td{
+    border:1px solid #ddd;
+	color:#CC6633;
+    padding:8px;
+    font-size:14px;
+	line-height:1.2;
+}
+
+.yenyem-details-table th th1{
+    width:10%;
+}
+.yenyem-details-table td td1{
+    width:55%;
+}
+
+.yenyem-details-table td td2{
+    width:35%;
+}
+
+.yenyem-details-table tr:nth-child(even){
+    background:#fff8d6;
+}
+
+.yenyem-details-table th p{
+    color:#999966;
+}
+
+.senlendat-details-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+.senlendat-details-table th{
+    border:1px solid #ddd;
+    color:#CC3300;
+    text-align:left;
+    padding:8px;
+    font-size:14px;
+	line-height:1.5;
+}
+
+.senlendat-details-table td{
+    border:1px solid #ddd;
+	color:#CC6633;
+    padding:8px;
+    font-size:14px;
+	line-height:1.5;
+}
+
+.senlendat-details-table tr:nth-child(even){
+    background:#fff8d6;
+}
+
+footer{
+    margin-top:auto;
+    background:#FF9900; /* Bright Yellow */
+    color:#000;
+    text-align:center;
+    padding:12px;
+}
+
+@media(max-width:768px){
+
+    .container{
+        width:95%;
+        margin:90px auto 20px auto;
+    }
+
+    .today-info{
+        top:80px;
+    }
+
+    .day,
+    .empty{
+        min-height:70px;
+    }
+
+    .ad-date{
+        font-size:16px;
+    }
+
+    .today .ad-date{
+        width:28px;
+        height:28px;
+    }
+
+    /* Add these new rules */
+    .info-container{
+        flex-direction:column;
+    }
+
+    .info-box{
+        width:100%;
+    }
+
+}
+
+/* ============ SELECTED DAY ============ */
+.day.selected{
+    outline:2px solid #2563eb;
+    outline-offset:-2px;
+}
+
+.day.selected:not(.today) .ad-date{
+    color:#2563eb;
+}
+
+/* ============ ACTION BAR ============ */
+.action-bar{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:5px;
+    margin-bottom:5px;
+}
+
+.action-btn{
+    padding:8px 14px;
+    border:none;
+    color:#fff;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:14px;
+    transition:opacity .15s ease, transform .1s ease;
+}
+
+.action-btn:hover{
+    opacity:0.9;
+}
+
+.action-btn:active{
+    transform:scale(0.97);
+}
+
+.action-btn:disabled{
+    opacity:0.6;
+    cursor:not-allowed;
+}
+
+.theme-btn{ background:#6b21a8; }
+.today-btn{ background:#2563eb; }
+.year-btn{ background:#059669; }
+.pdf-btn{ background:#dc2626; }
+
+/* ============ DAY / NIGHT THEME ============ */
+body.night-theme{
+    background:#12121f;
+    color:#e6e6f0;
+}
+
+body.night-theme header{
+    background:#3a2e6e;
+}
+
+body.night-theme .header-title,
+body.night-theme .header-title h1{
+    color:#f0f0ff;
+}
+
+body.night-theme .dropdown-menu{
+    background:#1c1c30;
+    box-shadow:2px 0 10px rgba(0,0,0,.6);
+}
+
+body.night-theme .dropdown-menu a{
+    color:#e6e6f0;
+    border-bottom:1px solid #2c2c48;
+}
+
+body.night-theme .dropdown-menu a:hover{
+    background:#2c2c48;
+}
+
+body.night-theme .today-info{
+    background:#1c1c30;
+    color:#e6e6f0;
+    box-shadow:0 2px 8px rgba(0,0,0,.5);
+}
+
+body.night-theme .controls select{
+    background:#1c1c30;
+    color:#e6e6f0;
+    border:1px solid #3a3a5e;
+}
+
+body.night-theme .controls button{
+    background:#3a2e6e;
+}
+
+body.night-theme .calendar{
+    background:#1c1c30;
+    box-shadow:0 4px 15px rgba(0,0,0,.5);
+}
+
+body.night-theme .month-title{
+    background:#3a2e6e;
+    color:#f0f0ff;
+}
+
+body.night-theme .weekdays{
+    background:#26264a;
+}
+
+body.night-theme .weekdays div{
+    color:#c8b8ff;
+}
+
+body.night-theme .day,
+body.night-theme .empty{
+    background:#1c1c30;
+    border:1px solid #2c2c48;
+}
+
+body.night-theme .day:hover{
+    background:#26264a;
+}
+
+body.night-theme .ad-date{
+    color:#e6e6f0;
+}
+
+body.night-theme .kirat-date{
+    color:#8fb4ff;
+}
+
+body.night-theme .info-box{
+    background:#1c1c30;
+    color:#e6e6f0;
+    box-shadow:0 2px 8px rgba(0,0,0,.5);
+}
+
+body.night-theme .details-table th,
+body.night-theme .details-table td,
+body.night-theme .yenyem-details-table th,
+body.night-theme .yenyem-details-table td,
+body.night-theme .senlendat-details-table th,
+body.night-theme .senlendat-details-table td{
+    border:1px solid #2c2c48;
+}
+
+body.night-theme .details-table tr:nth-child(even),
+body.night-theme .yenyem-details-table tr:nth-child(even),
+body.night-theme .senlendat-details-table tr:nth-child(even){
+    background:#22223e;
+}
+
+body.night-theme footer{
+    background:#3a2e6e;
+    color:#f0f0ff;
+}
+
+body.night-theme .page-content-inner,
+body.night-theme .year-month-card,
+body.night-theme .year-view-header{
+    background:#1c1c30;
+    color:#e6e6f0;
+    box-shadow:0 2px 8px rgba(0,0,0,.5);
+}
+
+body.night-theme .year-month-weekdays div,
+body.night-theme .year-month-weekdays span{
+    color:#c8b8ff;
+}
+
+body.night-theme .yv-day:hover{
+    background:#26264a;
+}
+
+/* ============ PAGE CONTENT (hamburger menu pages) ============ */
+.page-content{
+    display:none;
+    width:95%;
+    max-width:800px;
+    margin:100px auto 20px auto;
+}
+
+.page-content-inner{
+    background:#fff9e6;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 4px 15px rgba(0,0,0,.1);
+}
+
+.page-content-inner h2{
+    margin-bottom:15px;
+    color:#CC3300;
+}
+
+.page-content-inner p{
+    line-height:1.6;
+    margin-bottom:20px;
+}
+
+.back-btn{
+    padding:10px 16px;
+    border:none;
+    background:#1f2937;
+    color:#fff;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.back-btn:hover{
+    opacity:0.9;
+}
+
+/* ============ YEAR VIEW ============ */
+.year-view{
+    display:none;
+    width:85%;
+    max-width:1300px;
+    margin:100px auto 20px auto;
+}
+
+.year-view-header{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:15px;
+    background:#fff9e6;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:15px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+    flex-wrap:wrap;
+}
+
+.year-view-header h2{
+    color:#CC3300;
+}
+
+.year-view-header button{
+    padding:8px 14px;
+    border:none;
+    background:#1f2937;
+    color:#fff;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.year-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr); /* Desktop: 6 columns x 2 rows */
+    gap:15px;
+}
+
+.year-month-card{
+    background:#fffdf2;
+    border-radius:10px;
+    padding:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+.year-month-title{
+    text-align:center;
+    font-weight:bold;
+    color:#CC3300;
+    font-size:16px;
+    margin-bottom:6px;
+    line-height:1.3;
+}
+
+.year-month-title small{
+    font-weight:bold;
+    color:#0000ff;
+    font-size:14px solid;
+}
+
+.year-month-weekdays{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    font-size:14px;
+    text-align:center;
+    color:#5b4a00;
+    font-weight:bold;
+    margin-bottom:2px;
+}
+.year-month-weekdays span{
+	border-radius:4px;
+	border:1px solid #efe3b5;
+	padding:10px 0;
+}
+.year-month-days{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:2px;	
+}
+
+.yv-empty{
+    min-height:26px;
+}
+
+.yv-day{
+    min-height:52px; /* desktop default: room for Mangyuk/Lamikkhok lines */
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    border-radius:4px;
+	border:1px solid #efe3b5;
+    cursor:pointer;
+    font-size:9px;
+    line-height:1.1;
+}
+
+.yv-day:hover{
+    background:#fff4b8;
+}
+
+.yv-ad{
+    font-size:14px;
+    font-weight:bold;
+}
+
+.yv-kirat{
+    font-size:12px;
+    color:#2563eb;
+	align-self:flex-end;
+	width:100%;
+	text-align:right;
+	padding-right:4px;
+}
+
+.yv-today{
+    background:#2563eb;
+    color:#fff;
+    border-radius:4px;
+}
+
+.yv-today .yv-kirat{
+    color:#dbeafe;
+}
+
+/* Extra Mangyuk (above English date) / Lamikkhok (below Kirat date) info —
+   shown only on desktop-size screens inside the year view day cells */
+.yv-day{
+    padding:2px 1px;
+}
+
+.yv-mangyuk,
+.yv-lamikkhok{
+    font-size:7px;
+    line-height:1.05;
+    color:#8a6d00;
+	font-family:'XenoType LIF Ilam'
+    text-align:center;
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+body.night-theme .yv-mangyuk,
+body.night-theme .yv-lamikkhok{
+    color:#c8b8ff;
+}
+
+/* Generic helper: only visible on desktop-sized viewports */
+.desktop-only{
+    display:inline-flex;
+}
+
+@media(max-width:900px){
+    .year-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+    .yv-mangyuk,
+    .yv-lamikkhok{
+        display:none; /* keep extra Kirat detail desktop-only */
+    }
+    .desktop-only{
+        display:none;
+    }
+    .yv-day{
+        min-height:26px; /* mobile: unchanged, compact cell */
+    }
+}
+
+@media(max-width:560px){
+    .year-grid{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="menu-container">
+
+<button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+<div id="dropdownMenu" class="dropdown-menu">
+    <div class="dropdown-close-row">
+        <button class="menu-close-btn" onclick="toggleMenu()" aria-label="Close menu">✕</button>
+    </div>
+    <a href="javascript:void(0)" onclick="showPage('home')">🏠 Home</a>
+    <a href="javascript:void(0)" onclick="showPage('about')">👤 About Us</a>
+    <a href="javascript:void(0)" onclick="showPage('yamdhangsang')">🕒 Yamdhangsang</a>
+    <a href="javascript:void(0)" onclick="showPage('festivals')">🎉 Festivals</a>
+    <a href="javascript:void(0)" onclick="showPage('planets')">🪐 Planets</a>
+    <a href="javascript:void(0)" onclick="showPage('contact')">📞 Contact Us</a>
+</div>
+
+</div>
+
+<div class="header-title">
+    <h1 style="font-size:20px;color:#ffffff;font-family:'XenoType LIF Ilam';">
+    ᤀᤥᤳ ᤋᤠᤃᤧᤖᤠ ᤏᤡᤱᤘᤠᤓᤢᤔᤠᤱᤅᤣ ᤛᤣᤘᤠᤖᤥ॥
+    </h1>
+    KIRAT KHAIK MUNDHUM CALENDAR
+</div>
+
+</header>
+
+<div class="container">
+
+<div id="todayInfo" class="today-info"></div>
+
+<div class="controls">
+<button onclick="prevMonth()">◀</button>
+<select id="monthSelect"></select>
+<select id="yearSelect"></select>
+<button onclick="nextMonth()">▶</button>
+</div>
+
+<div class="action-bar">
+    <button id="themeToggleBtn" class="action-btn theme-btn" onclick="toggleTheme()">🌙 Night</button>
+    <button class="action-btn today-btn" onclick="goToday()">📅 Today</button>
+    <button class="action-btn year-btn" onclick="toggleYearView()">🗓️ Year</button>
+    <button id="savePdfBtn" class="action-btn pdf-btn" onclick="savePDF()">⬇️ Save PDF</button>
+</div>
+
+
+<div class="calendar">
+<div class="month-title" id="monthYear"></div>
+
+<div class="weekdays">
+	<div>ᤋᤧᤏᤧ<br>Sun</div>
+	<div>ᤑᤥᤖᤠᤠ<br>Mon</div>
+	<div>ᤔᤡᤰ<br>Tue</div>
+	<div>ᤂᤧᤰ<br>Wed</div>
+	<div>ᤁᤢᤖᤢᤵ<br>Thu</div>
+	<div>ᤑᤛᤢᤵ<br>Fri</div>
+	<div>ᤛᤧᤴ<br>Sat</div>
+</div>
+
+<div class="days" id="calendarDays"></div>
+</div> <!-- container ends -->
+
+		<div class="info-container">
+
+			<div class="info-box" id="infoBox1">
+
+				<h3>Kirat Language</h3>
+
+				Click a date to view details.
+
+			</div>
+
+			<div class="info-box" id="infoBox2">
+
+				<h3>English</h3>
+
+				Click a date to view details.
+
+			</div>
+
+		</div> 
+
+</div> <!-- end of container -->
+
+<div id="pageContent" class="page-content"></div>
+
+<div id="yearView" class="year-view"></div>
+
+<footer>
+Kirat Calendar © 2026
+</footer>
+
+
+<script>
+/* MONTHS */
+const months=[
+"January","February","March","April","May","June",
+"July","August","September","October","November","December"
+];
+
+/* SAMPLE PANCHANGA */
+const panchangaData={
+	"2026-01-01":{
+		KiratMonthYear:"Siksekla - Kakphekwa, 5086",
+	},
+	
+	"2026-02-01":{
+		KiratMonthYear:"Kakphekwa - Sapphekwa, 5086",
+	},
+	
+	"2026-03-01":{
+		KiratMonthYear:"Sapphekwa, 5086 - Cherengnam, 5087",
+	},
+	
+	"2026-04-01":{
+		KiratMonthYear:"Cherengnam - Therengnam, 5087",
+	},
+	
+	"2026-05-01":{
+		KiratMonthYear:"Therengnam - Kapmeppa, 5087",
+	},
+	
+	"2026-08-01":{
+		KiratMonthYear:"Sisekpa - Thesekpa, 5087",
+	}, 
+	
+	"2026-09-01":{
+		KiratMonthYear:"Thesekpa - Sisekro, 5087",
+	}, 
+	
+	"2026-10-01":{
+		KiratMonthYear:"Sisekro - Thesekro, 5087",
+	}, 
+	
+	"2026-11-01":{
+		KiratMonthYear:"Thesekro - Senchhrengla, 5087",
+	}, 
+	
+	"2026-12-01":{
+		KiratMonthYear:"Senchhrengla - Sisekla, 5087",
+	}, 
+	
+	
+	"2026-06-01":{
+		KiratMonthYear:"Kapmeppa - Thakmeppa, 5087",
+		KiratDate:"Kapmeppa 18, 5087",
+		day:"Monday",
+		KiratDay:"Phoraba",
+		tLamikkhok:"Lanuppa-Lagungba",
+		Lamikkhok:"Lagungba upto 17:09",
+		nextL:"Laringba",
+		Mangyuk:"Khamik upto 19:40",
+		nextM:"Lingwa",
+		Samyuk:"Thumlumbeba upto 06:50",
+		nextS:"Tekpalba",
+		Khok:"Kungsing upto 17:09",
+		Khok2:"Imbyesing upto 30:21",
+		HangHangwa:"Phesing upto 19:40",
+		nextH:"Ipkhemba",
+		Labhrang:"Lanuppa",
+		moonSign:"Nakla upto 19:40",
+		sunSign:"Wakla",
+		YemPhakmura:"06:49 to 08:32",
+		MidhungYangdhok:"Iksa upto 17:09 (Destory Wealth)",
+		HangsamYangdhok:"Sobu upto 17:09 (Auspicious)",
+		Wanma:"Hangwanma",
+		Namba:"Thenamba",
+		KaliYuga:"5127",
+		BikramSambat:"2083",
+		SakaSambat:"1948",
+	},
+
+"2026-06-29":{
+KiratMonthYear:"Kapmeppa - Thakmeppa, 5087",
+KiratDate:"Thakmeppa 15, 5087",
+day:"Monday",
+KiratDay:"Phoraba",
+tLamikkhok:"Lanuppa-Labhumba",
+Lamikkhok:"(15) Labhumba upto 29:58",
+nextL:"(15) Labhumba",
+Mangyuk:"(19) Lingwa upto 28:35",
+nextM:"(20) Pewa",
+Samyuk:"(24) Takyumba upto 14:57",
+nextS:"(25) Tonlungba",
+Khok:"(07) Lahasosing upto 16:48",
+Khok2:"(01) Lahangsing upto 29:58",
+HangHangwa:"(15) Phrengdangnu upto 28:35",
+nextH:"(12) Sobu",
+Labhrang:"Lanuppa",
+moonSign:"(09) ♐ Phanam - Sagittarius",
+sunSign:"(03) ♊ Kanam - Gemini",
+SunMangyuk:"(06) Kungwa",
+YemPhakmura:"06:52 to 08:36",
+GulikaKala:"13:48 to 15:32",
+YamagandaKala:"10:20 to 12:04",
+DurMuhurta:"12:32 to 13:27",
+nextDur:"15:18 to 16:14",
+SammangMura:"Singlaba (Pano)",
+nextSM:"",
+MidhungYangdhok:"Tangsang upto 29:58 (Life Fatal)",
+HangsamYangdhok:"Sijumbho upto 29:58 (Death)",
+AkwanamangSikkum:"North-Thangget",
+NagaSikkum:"North-Thangget",
+SinglaSikkum:"Yellow",
+SinglaYangdhok:"East",
+ChrangYangdhok:"Northwest upto 29:58 ",
+PhakmuraYangdhok:"NW-Khesen",
+PisangTangba:"East-Namget",
+MangyukTangba:"West upto 28:35",
+SariKap:"",
+SunRise:"05:08:36 AM",
+SunSet:"19:00:29 PM",
+dayDuration:"13 Hours 51 Minutes 53 Seconds",
+nightDuration:"10 Hours 08 Minutes 28 Seconds",
+Wanma:"☀️ Hangwanma-Grishma",
+Namba:"Thenamba",
+KaliYuga:"5127",
+BikramSambat:"2083",
+SakaSambat:"1948",
+/* YenYem */dayYemY1:"Mangghu", dayYemY2:"Siya", dayYemY3:"Pano", dayYemY4:"Tung", dayYemY5:"Mudo", dayYemY6:"Membupek", dayYemY7:"Labo", dayYemY8:"Mangghu", nightYemY1:"Membupek", nightYemY2:"Tung", nightYemY3:"Siya", nightYemY4:"Labo", nightYemY5:"Mudo", nightYemY6:"Pano", nightYemY7:"Mangghu", nightYemY8:"Membupek", /* YenYem English Meaning */dayYemyEng1:"(Nectar)", dayYemyEng2:"(Death)", dayYemyEng3:"(Auspicious)", dayYemyEng4:"(Illness)", dayYemyEng5:"(Anxiety)", dayYemyEng6:"(Moving)", dayYemyEng7:"(Profit)", dayYemyEng8:"(Nectar)", nightYemyEng1:"(Moving)", nightYemyEng2:"(Illness)", nightYemyEng3:"(Death)", nightYemyEng4:"(Profit)", nightYemyEng5:"(Anxiety)", nightYemyEng6:"(Auspicious)", nightYemyEng7:"(Nectar)", nightYemyEng8:"(Moving)", /* YenYem timing */dayYemYT1:"05:08 to 06:52", dayYemYT2:"06:52 to 08:36", dayYemYT3:"08:36 to 10:20", dayYemYT4:"10:20 to 12:04", dayYemYT5:"12:04 to 13:48", dayYemYT6:"13:48 to 15:32", dayYemYT7:"15:32 to 17:16", dayYemYT8:"17:16 to 19:00", nightYemYT1:"19:00 to 20:16", nightYemYT2:"20:16 to 21:32", nightYemYT3:"21:32 to 22:48", nightYemYT4:"22:48 to 24:04", nightYemYT5:"24:04 to 25:20", nightYemYT6:"25:20 to 26:36", nightYemYT7:"26:36 to 27:52", nightYemYT8:"27:52 to 29:08", /* YenYem Result */dayYemyResult1:"Good", dayYemyResult2:"Bad", dayYemyResult3:"Good", dayYemyResult4:"Bad", dayYemyResult5:"Bad", dayYemyResult6:"Good", dayYemyResult7:"Good", dayYemyResult8:"Good", nightYemyResult1:"Good", nightYemyResult2:"Bad", nightYemyResult3:"Bad", nightYemyResult4:"Good", nightYemyResult5:"Bad", nightYemyResult6:"Good", nightYemyResult7:"Good", nightYemyResult8:"Good",
+/* Senlendat */daySenlen1:"Singla", daySenlen2:"Pung", daySenlen3:"Payang", daySenlen4:"Khawa", daySenlen5:"Thung", daySenlen6:"Tung", daySenlen7:"Saya", daySenlen8:"Singla", daySenlen9:"Pung", daySenlen10:"Payang", daySenlen11:"Khawa", daySenlen12:"Thung", nightSenlen1:"Tung", nightSenlen2:"Saya", nightSenlen3:"Singla", nightSenlen4:"Pung", nightSenlen5:"Payang", nightSenlen6:"Khawa", nightSenlen7:"Thung", nightSenlen8:"Tung", nightSenlen9:"Saya", nightSenlen10:"Singla", nightSenlen11:"Pung", nightSenlen12:"Payang",   /* SenlendatT */daySenlenT1:"05:08 to 06:17", daySenlenT2:"06:17 to 07:27", daySenlenT3:"07:27 to 08:36", daySenlenT4:"08:36 to 09:45", daySenlenT5:"09:45 to 10:55", daySenlenT6:"10:55 to 12:04", daySenlenT7:"12:04 to 13:13", daySenlenT8:"13:13 to 14:23", daySenlenT9:"14:23 to 15:32", daySenlenT10:"15:32 to 16:41", daySenlenT11:"16:41 to 17:51", daySenlenT12:"17:51 to 19:00", nightSenlenT1:"19:00 to 19:51", nightSenlenT2:"19:51 to 20:41", nightSenlenT3:"20:41 to 21:32", nightSenlenT4:"21:32 to 22:23", nightSenlenT5:"22:23 to 23:14", nightSenlenT6:"23:14 to 24:04", nightSenlenT7:"24:04 to 24:55", nightSenlenT8:"24:55 to 25:46", nightSenlenT9:"25:46 to 26:36", nightSenlenT10:"26:36 to 27:27", nightSenlenT11:"27:27 to 28:18", nightSenlenT12:"28:18 to 29:08", /* SenlendatResult */daySenlenResult1:"All works Auspicious", daySenlenResult2:"Collection of Money", daySenlenResult3:"Marriage", daySenlenResult4:"War", daySenlenResult5:"Government work", daySenlenResult6:"Travel", daySenlenResult7:"Studies", daySenlenResult8:"All works Auspicious", daySenlenResult9:"Collection of Money", daySenlenResult10:"Marriage", daySenlenResult11:"War", daySenlenResult12:"Government work", nightSenlenResult1:"Travel", nightSenlenResult2:"Studies", nightSenlenResult3:"All works Auspicious", nightSenlenResult4:"Collection of Money", nightSenlenResult5:"Marriage", nightSenlenResult6:"War", nightSenlenResult7:"Government work", nightSenlenResult8:"Travel", nightSenlenResult9:"Studies", nightSenlenResult10:"All works Auspicious", nightSenlenResult11:"Collection of Money", nightSenlenResult12:"Marriage",
+},
+
+"2026-06-30":{
+KiratMonthYear:"Kapmeppa - Thakmeppa, 5087",
+KiratDate:"Thakmeppa 16, 5087",
+day:"Tuesday",
+KiratDay:"Mikhangba",
+tLamikkhok:"Lanuppa-Labhumba",
+Lamikkhok:"(15) Labhumba upto 05:58",
+nextL:"(14) Lagungba",
+Mangyuk:"(20) Pewa upto 31:23",
+nextM:"(20) Pewa",
+Samyuk:"(25) Tonlungba upto 15:49",
+nextS:"(26) Thakkeppa",
+Khok:"(01) Lahangsing upto 05:58",
+Khok2:"(03) Lagungsing upto 19:04",
+HangHangwa:"(12) Sobu upto 31:23",
+nextH:"(08) Muigha",
+Labhrang:"Lanuppa",
+moonSign:"(09) ♐ Phanam - Sagittarius",
+sunSign:"(03) ♊ Kanam - Gemini",
+SunMangyuk:"(06) Kungwa",
+YemPhakmura:"15:32 to 17:16",
+GulikaKala:"12:04 to 13:48",
+YamagandaKala:"08:36 to 10:20",
+DurMuhurta:"07:55 to 08:50",
+nextDur:"23:04 to 23:59",
+SammangMura:"Singlaba (Pano)",
+nextSM:"",
+MidhungYangdhok:"Iksa upto 05:58 (Destory Wealth)",
+HangsamYangdhok:"Sijumbho upto 05:58 (Death)",
+AkwanamangSikkum:"North-Thangget",
+NagaSikkum:"North-Thangget",
+SinglaSikkum:"Yellow",
+SinglaYangdhok:"East",
+ChrangYangdhok:"Northwest upto 05:58 ",
+PhakmuraYangdhok:"West-Namdha",
+PisangTangba:"North-Thangget",
+MangyukTangba:"Free",
+SariKap:"",
+SunRise:"05:08:57 AM",
+SunSet:"19:00:33 PM",
+dayDuration:"13 Hours 51 Minutes 36 Seconds",
+nightDuration:"10 Hours 08 Minutes 46 Seconds",
+Wanma:"☀️ Hangwanma-Grishma",
+Namba:"Thenamba",
+KaliYuga:"5127",
+BikramSambat:"2083",
+SakaSambat:"1948",
+/* YenYem */dayYemY1:"Tung", dayYemY2:"Mudo", dayYemY3:"Membupek", dayYemY4:"Labo", dayYemY5:"Mangghu", dayYemY6:"Siya", dayYemY7:"Pano", dayYemY8:"Tung", nightYemY1:"Siya", nightYemY2:"Labo", nightYemY3:"Mudo", nightYemY4:"Pano", nightYemY5:"Mangghu", nightYemY6:"Membupek", nightYemY7:"Tung", nightYemY8:"Siya", /* YenYem English Meaning */dayYemyEng1:"(Illness)", dayYemyEng2:"(Anxiety)", dayYemyEng3:"(Moving)", dayYemyEng4:"(Profit)", dayYemyEng5:"(Nectar)", dayYemyEng6:"(Death)", dayYemyEng7:"(Auspicious)", dayYemyEng8:"(Illness)", nightYemyEng1:"(Death)", nightYemyEng2:"(Profit)", nightYemyEng3:"(Anxiety)", nightYemyEng4:"(Auspicious)", nightYemyEng5:"(Nectar)", nightYemyEng6:"(Moving)", nightYemyEng7:"(Illness)", nightYemyEng8:"(Death)", /* YenYem timing */dayYemYT1:"05:08 to 06:52", dayYemYT2:"06:52 to 08:36", dayYemYT3:"08:36 to 10:20", dayYemYT4:"10:20 to 12:04", dayYemYT5:"12:04 to 13:48", dayYemYT6:"13:48 to 15:32", dayYemYT7:"15:32 to 17:16", dayYemYT8:"17:16 to 19:00", nightYemYT1:"19:00 to 20:16", nightYemYT2:"20:16 to 21:32", nightYemYT3:"21:32 to 22:48", nightYemYT4:"22:48 to 24:04", nightYemYT5:"24:04 to 25:21", nightYemYT6:"25:21 to 26:37", nightYemYT7:"26:37 to 27:53", nightYemYT8:"27:53 to 29:09", /* YenYem Result */dayYemyResult1:"Bad", dayYemyResult2:"Bad", dayYemyResult3:"Good", dayYemyResult4:"Good", dayYemyResult5:"Good", dayYemyResult6:"Bad", dayYemyResult7:"Good", dayYemyResult8:"Bad", nightYemyResult1:"Bad", nightYemyResult2:"Good", nightYemyResult3:"Bad", nightYemyResult4:"Good", nightYemyResult5:"Good", nightYemyResult6:"Good", nightYemyResult7:"Bad", nightYemyResult8:"Bad",
+/* Senlendat */daySenlen1:"Khawa", daySenlen2:"Thung", daySenlen3:"Tung", daySenlen4:"Saya", daySenlen5:"Singla", daySenlen6:"Pung", daySenlen7:"Payang", daySenlen8:"Khawa", daySenlen9:"Thung", daySenlen10:"Tung", daySenlen11:"Saya", daySenlen12:"Singla", nightSenlen1:"Pung", nightSenlen2:"Payang", nightSenlen3:"Khawa", nightSenlen4:"Thung", nightSenlen5:"Tung", nightSenlen6:"Saya", nightSenlen7:"Singla", nightSenlen8:"Pung", nightSenlen9:"Payang", nightSenlen10:"Khawa", nightSenlen11:"Thung", nightSenlen12:"Tung",   /* SenlendatT */daySenlenT1:"05:08 to 06:18", daySenlenT2:"06:18 to 07:27", daySenlenT3:"07:27 to 08:36", daySenlenT4:"08:36 to 09:46", daySenlenT5:"09:46 to 10:55", daySenlenT6:"10:55 to 12:04", daySenlenT7:"12:04 to 13:14", daySenlenT8:"13:14 to 14:23", daySenlenT9:"14:23 to 15:32", daySenlenT10:"15:32 to 16:41", daySenlenT11:"16:41 to 17:51", daySenlenT12:"17:51 to 19:00", nightSenlenT1:"19:00 to 19:51", nightSenlenT2:"19:51 to 20:42", nightSenlenT3:"20:42 to 21:32", nightSenlenT4:"21:32 to 22:23", nightSenlenT5:"22:23 to 23:14", nightSenlenT6:"23:14 to 24:04", nightSenlenT7:"24:04 to 24:55", nightSenlenT8:"24:55 to 25:46", nightSenlenT9:"25:46 to 26:37", nightSenlenT10:"26:37 to 27:27", nightSenlenT11:"27:27 to 28:18", nightSenlenT12:"28:18 to 29:09", /* SenlendatResult */daySenlenResult1:"War", daySenlenResult2:"Government work", daySenlenResult3:"Travel", daySenlenResult4:"Studies", daySenlenResult5:"All works Auspicious", daySenlenResult6:"Collection of Money", daySenlenResult7:"Marriage", daySenlenResult8:"War", daySenlenResult9:"Government work", daySenlenResult10:"Travel", daySenlenResult11:"Studies", daySenlenResult12:"All works Auspicious", nightSenlenResult1:"Collection of Money", nightSenlenResult2:"Marriage", nightSenlenResult3:"War", nightSenlenResult4:"Government work", nightSenlenResult5:"Travel", nightSenlenResult6:"Studies", nightSenlenResult7:"All works Auspicious", nightSenlenResult8:"Collection of Money", nightSenlenResult9:"Marriage", nightSenlenResult10:"War", nightSenlenResult11:"Government work", nightSenlenResult12:"Travel",
+},
+
+"2026-07-01":{
+KiratMonthYear:"Thakmeppa - Sisekpa, 5087",
+KiratDate:"Thakmeppa 17, 5087",
+day:"Wednesday",
+KiratDay:"Kheksuba",
+tLamikkhok:"Lanuppa-Lagungba",
+Lamikkhok:"(14) Lagungba upto 08:09",
+nextL:"(13) Laringba",
+Mangyuk:"(20) Pewa upto 07:22",
+nextM:"(21) Nuik",
+Samyuk:"(26) Thakkeppa upto 16:34",
+nextS:"(27) Tanggeba",
+Khok:"(03) Lagungsing upto 08:09",
+Khok2:"(04) Laimbhesing upto 21:10",
+HangHangwa:"(08) Muigha upto 07:22",
+nextH:"(05) Ponglungdhang",
+Labhrang:"Lanuppa",
+moonSign:"(09) ♐ Phanam - Sagittarius upto 14:01",
+sunSign:"(03) ♊ Kanam - Gemini",
+SunMangyuk:"(06) Kungwa",
+YemPhakmura:"12:04 to 13:48",
+GulikaKala:"10:21 to 12:04",
+YamagandaKala:"06:53 to 08:37",
+DurMuhurta:"11:37 to 12:32",
+nextDur:"",
+SammangMura:"Singlaba (Pano) upto 07:22",
+nextSM:"Khawatlungba (Kubhen)",
+MidhungYangdhok:"Iksa upto 08:09 (Destory Wealth)",
+HangsamYangdhok:"Sobu upto 08:09 (Auspicious)",
+AkwanamangSikkum:"North-Thangget",
+NagaSikkum:"North-Thangget",
+SinglaSikkum:"Yellow upto 14:01",
+SinglaYangdhok:"East upto 14:01",
+ChrangYangdhok:"East upto 08:09 ",
+PhakmuraYangdhok:"SW-Wamisang",
+PisangTangba:"North-Thangget",
+MangyukTangba:"Free",
+SariKap:"",
+SunRise:"05:09:18 AM",
+SunSet:"19:00:35 PM",
+dayDuration:"13 Hours 51 Minutes 16 Seconds",
+nightDuration:"10 Hours 09 Minutes 06 Seconds",
+Wanma:"☀️ Hangwanma-Grishma",
+Namba:"Thenamba",
+KaliYuga:"5127",
+BikramSambat:"2083",
+SakaSambat:"1948",
+/* YenYem */dayYemY1:"Labo", dayYemY2:"Mangghu", dayYemY3:"Siya", dayYemY4:"Pano", dayYemY5:"Tung", dayYemY6:"Mudo", dayYemY7:"Membupek", dayYemY8:"Labo", nightYemY1:"Mudo", nightYemY2:"Pano", nightYemY3:"Mangghu", nightYemY4:"Membupek", nightYemY5:"Tung", nightYemY6:"Siya", nightYemY7:"Labo", nightYemY8:"Mudo", /* YenYem English Meaning */dayYemyEng1:"(Profit)", dayYemyEng2:"(Nectar)", dayYemyEng3:"(Death)", dayYemyEng4:"(Auspicious)", dayYemyEng5:"(Illness)", dayYemyEng6:"(Anxiety)", dayYemyEng7:"(Moving)", dayYemyEng8:"(Profit)", nightYemyEng1:"(Anxiety)", nightYemyEng2:"(Auspicious)", nightYemyEng3:"(Nectar)", nightYemyEng4:"(Moving)", nightYemyEng5:"(Illness)", nightYemyEng6:"(Death)", nightYemyEng7:"(Profit)", nightYemyEng8:"(Anxiety)", /* YenYem timing */dayYemYT1:"05:09 to 06:53", dayYemYT2:"06:53 to 08:37", dayYemYT3:"08:37 to 10:21", dayYemYT4:"10:21 to 12:04", dayYemYT5:"12:04 to 13:48", dayYemYT6:"13:48 to 15:32", dayYemYT7:"15:32 to 17:16", dayYemYT8:"17:16 to 19:00", nightYemYT1:"19:00 to 20:16", nightYemYT2:"20:16 to 21:32", nightYemYT3:"21:32 to 22:48", nightYemYT4:"22:48 to 24:05", nightYemYT5:"24:05 to 25:21", nightYemYT6:"25:21 to 26:37", nightYemYT7:"26:37 to 27:53", nightYemYT8:"27:53 to 29:09", /* YenYem Result */dayYemyResult1:"Good", dayYemyResult2:"Good", dayYemyResult3:"Bad", dayYemyResult4:"Good", dayYemyResult5:"Bad", dayYemyResult6:"Bad", dayYemyResult7:"Good", dayYemyResult8:"Good", nightYemyResult1:"Bad", nightYemyResult2:"Good", nightYemyResult3:"Good", nightYemyResult4:"Good", nightYemyResult5:"Bad", nightYemyResult6:"Bad", nightYemyResult7:"Good", nightYemyResult8:"Bad",
+/* Senlendat */daySenlen1:"Saya", daySenlen2:"Singla", daySenlen3:"Pung", daySenlen4:"Payang", daySenlen5:"Khawa", daySenlen6:"Thung", daySenlen7:"Tung", daySenlen8:"Saya", daySenlen9:"Singla", daySenlen10:"Pung", daySenlen11:"Payang", daySenlen12:"Khawa", nightSenlen1:"Thung", nightSenlen2:"Tung", nightSenlen3:"Saya", nightSenlen4:"Singla", nightSenlen5:"Pung", nightSenlen6:"Payang", nightSenlen7:"Khawa", nightSenlen8:"Thung", nightSenlen9:"Tung", nightSenlen10:"Saya", nightSenlen11:"Singla", nightSenlen12:"Pung", /* SenlendatT */daySenlendatStart1:"05:09", daySenlendatStart2:"06:18", daySenlendatStart3:"07:27", daySenlendatStart4:"08:37", daySenlendatStart5:"09:46", daySenlendatStart6:"10:55", daySenlendatStart7:"12:04", daySenlendatStart8:"13:14", daySenlendatStart9:"14:23", daySenlendatStart10:"15:32", daySenlendatStart11:"16:42", daySenlendatStart12:"17:51", nightSenlendatStart1:"19:00", nightSenlendatStart2:"19:51", nightSenlendatStart3:"20:42", nightSenlendatStart4:"21:32", nightSenlendatStart5:"22:23", nightSenlendatStart6:"23:14", nightSenlendatStart7:"24:05", nightSenlendatStart8:"24:55", nightSenlendatStart9:"25:46", nightSenlendatStart10:"26:37", nightSenlendatStart11:"27:28", nightSenlendatStart12:"28:18", /* SenlendatT */daySenlendatEnd1:"06:18", daySenlendatEnd2:"07:27", daySenlendatEnd3:"08:37", daySenlendatEnd4:"09:46", daySenlendatEnd5:"10:55", daySenlendatEnd6:"12:04", daySenlendatEnd7:"13:14", daySenlendatEnd8:"14:23", daySenlendatEnd9:"15:32", daySenlendatEnd10:"16:42", daySenlendatEnd11:"17:51", daySenlendatEnd12:"19:00", nightSenlendatEnd1:"19:51", nightSenlendatEnd2:"20:42", nightSenlendatEnd3:"21:32", nightSenlendatEnd4:"22:23", nightSenlendatEnd5:"23:14", nightSenlendatEnd6:"24:05", nightSenlendatEnd7:"24:55", nightSenlendatEnd8:"25:46", nightSenlendatEnd9:"26:37", nightSenlendatEnd10:"27:28", nightSenlendatEnd11:"28:18", nightSenlendatEnd12:"29:09",
+},
+
+"2026-07-08":{	
+	KKiratMonthYear:"ᤌᤰᤔᤣᤵᤐᤠ - ᤛᤡᤛᤧᤰᤐᤠ, ᥋᥆᥎᥍",
+	KKiratDate:"ᤌᤰᤔᤣᤵᤐᤠ ᥈᥊, ᥋᥆᥎᥍",
+	Kday:"",
+	KKiratDay:"ᤂᤧᤰᤛᤢᤒᤠ",
+	KtLamikkhok:"ᤗᤠᤏᤢᤵᤐᤠ - ᤗᤠᤃᤶᤒᤠ",
+	KLamikkhok:"(᥆᥏) ᤗᤠᤃᤶᤒᤠ ᥇᥈:᥊᥎:᥇᥊ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KmissingL:"",
+	KnextL:"(᥆᥏) ᤗᤠᤀᤶᤒᤠ",
+	KMangyuk:"(᥈᥍) ᤌᤠᤱᤘᤠ ᥇᥌:᥈᥋:᥊᥌ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KmissingM:"",
+	KnextM:"(᥆᥇) ᤀᤡᤛᤖᤡ",
+	KSamyuk:"(᥆᥌) ᤁᤢᤜᤗᤒᤠ ᥇᥉:᥆᥊:᥇᥍ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KmissingS:"",
+	KnextS:"(᥆᥍) ᤛᤒᤢᤱᤒᤠ",
+	KKhok:"(᥆᥉) ᤗᤠᤃᤢᤱᤛᤡᤱ ᥇᥈:᥊᥎:᥇᥊ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KKhok2:"(᥆᥊) ᤗᤠᤀᤡᤶᤓᤧ᤹ᤛᤡᤱ ᥈᥊:᥆᥇:᥊᥉ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KHangHangwa:"(᥇᥋) ᤑᤪᤧᤅ᤻ᤍᤱᤏᤢ ᥇᥌:᥈᥋:᥊᥌ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KnextH:"(᥇᥉) ᤋᤢᤶᤔᤏᤠ",
+	KLabhrang:"ᤗᤠᤏᤢᤵᤐᤠ",
+	KmoonSign:"♓ ᤆᤰᤗᤠ ᥇᥌:᥈᥋:᥊᥌ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KnextmoonS:"♈ ᤀᤏᤠᤶ",
+	KsunSign:"♊ ᤁᤏᤠᤶ",
+	KnextsunS:"",
+	KSunMangyuk:"(᥆᥍) ᤛᤠᤶᤛᤪᤡ",
+	KYemPhakmura:"",
+	KGulikaKala:"",
+	KYamagandaKala:"",
+	KDurMuhurta:"",
+	KnextDur:"",
+	KSammangMura:"",
+	KMidhungYangdhok:"",
+	KHangsamYangdhok:"",
+	KAkwanamangSikkum:"",
+	KNagaSikkum:"",
+	KSinglaSikkum:"",
+	KSinglaYangdhok:"",
+	KChrangYangdhok:"",
+	KPhakmuraYangdhok:"",
+	KPisangTangba:"",
+	KMangyukTangba:"",
+	KSariKap:"",
+	KSunRise:"",
+	KSunSet:"",
+	KdayDuration:"",
+	KnightDuration:"",
+	KWanma:"",
+	KNamba:"",
+	KKaliYuga:"",
+	KBikramSambat:"",
+	KSakaSambat:"",
+	
+	KiratMonthYear:"Thakmeppa - Sisekpa, 5087",
+	KiratDate:"Thakmeppa 24, 5087",
+	day:"Wednesday",
+	KiratDay:"Kheksuba",
+	tLamikkhok:"Lanuppa - Lagamba",
+	Lamikkhok:"(23) Lagamba upto 12:48:15",
+	missingL:"",
+	nextL:"(24) Laamba",
+	Mangyuk:"(27) Thangwa upto 16:25:47",
+	missingM:"",
+	nextM:"(01) Isari",
+	Samyuk:"(06) Kuhalaba upto 13:04:17",
+	missingS:"",
+	nextS:"(07) Sabungba",
+	Khok:"(03) Lagungsing upto 12:48:15",
+	Khok2:"(04) Laimbhesing upto 24:01:43",
+	HangHangwa:"(15) Phrengdangnu upto 16:25:47",
+	nextH:"(13) Tummana",
+	Labhrang:"Lanuppa",
+	moonSign:"♓ Chakla - Pisces upto 16:25:47",
+	nextmoonS:"♈ Anam - Aries",
+	sunSign:"♊ Kanam - Gemini",
+	nextsunS:"",
+	SunMangyuk:"(07) Samsri",
+	nextSM:"",
+	YemPhakmura:"",
+	GulikaKala:"",
+	YamagandaKala:"",
+	DurMuhurta:"",
+	nextDur:"",
+	SammangMura:"",
+	MidhungYangdhok:"",
+	HangsamYangdhok:"",
+	AkwanamangSikkum:"",
+	NagaSikkum:"",
+	SinglaSikkum:"",
+	SinglaYangdhok:"",
+	ChrangYangdhok:"",
+	PhakmuraYangdhok:"",
+	PisangTangba:"",
+	MangyukTangba:"",
+	SariKap:"",
+	SunRise:"",
+	SunSet:"",
+	dayDuration:"",
+	nightDuration:"",
+	Wanma:"",
+	Namba:"",
+	KaliYuga:"",
+	BikramSambat:"",
+	SakaSambat:"",
+},	
+
+"2026-07-09":{	
+	KKiratMonthYear:"ᤌᤰᤔᤣᤵᤐᤠ - ᤛᤡᤛᤧᤰᤐᤠ, ᥋᥆᥎᥍",
+	KKiratDate:"ᤌᤰᤔᤣᤵᤐᤠ ᥈᥋, ᥋᥆᥎᥍",
+	Kday:"",
+	KKiratDay:"ᤁᤢᤖᤢᤵᤐᤠ",
+	KtLamikkhok:"ᤗᤠᤏᤢᤵᤐᤠ - ᤗᤠᤀᤶᤒᤠ",
+	KLamikkhok:"(᥇᥆) ᤗᤠᤀᤶᤒᤠ ᥇᥇:᥆᥋:᥈᥊ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KmissingL:"",
+	KnextL:"(᥇᥆) ᤗᤠᤄᤧᤱᤒᤠ",
+	KMangyuk:"(᥆᥇) ᤀᤡᤛᤖᤡ ᥇᥋:᥈᥈:᥆᥉ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KmissingM:"",
+	KnextM:"(᥆᥈) ᤛᤔᤡ",
+	KSamyuk:"(᥆᥍) ᤛᤒᤢᤱᤒᤠ ᥇᥆:᥉᥏:᥈᥉ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KmissingS:"",
+	KnextS:"(᥆᥎) ᤁᤢᤜᤢ᤹ᤗᤠᤒᤠ",
+	KKhok:"(᥆᥋) ᤗᤠᤀᤡᤰᤛᤡᤱ ᥇᥇:᥆᥋:᥈᥊ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KKhok2:"(᥆᥌) ᤗᤠᤕᤢᤶᤛᤡᤱ ᥈᥇:᥋᥍:᥋᥍ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KHangHangwa:"(᥇᥉) ᤋᤢᤶᤔᤏᤠ ᥇᥋:᥈᥈:᥆᥉ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KnextH:"(᥇᥆) ᤕᤠᤶᤍᤢᤱ",
+	KLabhrang:"ᤗᤠᤏᤢᤵᤐᤠ",
+	KmoonSign:"♈ ᤀᤏᤠᤶ",
+	KnextmoonS:"",
+	KsunSign:"♊ ᤁᤏᤠᤶ",
+	KnextsunS:"",
+	KSunMangyuk:"(᥆᥍) ᤛᤠᤶᤛᤪᤡ",
+	KnextSM:"",
+	KYemPhakmura:"",
+	KGulikaKala:"",
+	KYamagandaKala:"",
+	KDurMuhurta:"",
+	KnextDur:"",
+	KSammangMura:"",
+	KnextSM:"",
+	KMidhungYangdhok:"ᤀᤡᤰᤛᤠ ᥇᥇:᥆᥋:᥈᥊ ᤕᤧᤶᤍᤠᤖᤡᤰ (ᤕᤠᤱᤛᤠ ᤑᤥᤕᤥ)",
+	
+	KHangsamYangdhok:"ᤆᤢᤶᤓᤥ ᥇᥇:᥆᥋:᥈᥊ ᤕᤧᤶᤍᤠᤖᤡᤰ (ᤁᤥᤘᤠ)",
+	
+	KAkwanamangSikkum:"",
+	KNagaSikkum:"",
+	KSinglaSikkum:"",
+	KSinglaYangdhok:"",
+	KChrangYangdhok:"ᤏᤠᤶᤃᤧᤳ ᥇᥇:᥆᥋:᥈᥊ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KPhakmuraYangdhok:"",
+	KPisangTangba:"ᤗᤠᤱᤃᤧᤳ",
+	KMangyukTangba:"Free",
+	KSariKap:"",
+	KSunRise:"",
+	KSunSet:"",
+	KdayDuration:"",
+	KnightDuration:"",
+	KWanma:"",
+	KNamba:"",
+	KKaliYuga:"",
+	KBikramSambat:"",
+	KSakaSambat:"",
+	
+	
+	
+	
+	KiratMonthYear:"Thakmeppa - Sisekpa, 5087",
+	KiratDate:"Thakmeppa 25, 5087",
+	day:"Thursday",
+	KiratDay:"Kuruppa",
+	tLamikkhok:"Lanuppa - Laamba",
+	Lamikkhok:"(24) Laamba upto 11:05:24",
+	missingL:"",
+	nextL:"(25) Laghengba",
+	Mangyuk:"(01) Isari upto 15:22:04",
+	missingM:"",
+	nextM:"(02) Sami",
+	Samyuk:"(07) Sabungba upto 10:39:24",
+	missingS:"",
+	nextS:"(08) Kuhalaba",
+	Khok:"(05) Laiksing upto 11:05:24",
+	Khok2:"(06) Layumsing upto 21:57:57",
+	HangHangwa:"(13) Tummana upto 15:22:04",
+	nextH:"(10) Yamdung",
+	Labhrang:"Lanuppa",
+	moonSign:"♈ Anam - Aries",
+	nextmoonS:"",
+	sunSign:"♊ Kanam - Gemini",
+	nextsunS:"",
+	SunMangyuk:"(07) Samsri",
+	nextSM:"",
+	YemPhakmura:"",
+	GulikaKala:"",
+	YamagandaKala:"",
+	DurMuhurta:"",
+	nextDur:"",
+	SammangMura:"",
+	nextSM:"",
+	MidhungYangdhok:"Iksa upto 11:05:24 (Destory Wealth)",
+	nextMidhungYangdhok:"Khambek (Auspicious)",
+	HangsamYangdhok:"Chumbho upto 11:05:24 (Grief)",
+	nextHangsamYangdhok:"Pangwa (Difficulty)",
+	AkwanamangSikkum:"",
+	NagaSikkum:"",
+	SinglaSikkum:"",
+	SinglaYangdhok:"",
+	ChrangYangdhok:"East-Namget upto 11:05:24",
+	PhakmuraYangdhok:"",
+	PisangTangba:"South-Langget",
+	MangyukTangba:"Free",
+	SariKap:"",
+	SunRise:"",
+	SunSet:"",
+	dayDuration:"",
+	nightDuration:"",
+	Wanma:"",
+	Namba:"",
+	KaliYuga:"",
+	BikramSambat:"",
+	SakaSambat:"",
+	
+	
+},	
+
+"2026-07-10":{	
+	KKiratMonthYear:"ᤌᤰᤔᤣᤵᤐᤠ - ᤛᤡᤛᤧᤰᤐᤠ, ᥋᥆᥎᥍",
+	KKiratDate:"ᤌᤰᤔᤣᤵᤐᤠ ᥈᥌, ᥋᥆᥎᥍",
+	Kday:"",
+	KKiratDay:"ᤑᤛᤢᤵᤐᤠ",
+	KtLamikkhok:"ᤗᤠᤏᤢᤵᤐᤠ - ᤗᤠᤄᤧᤱᤒᤠ",
+	KLamikkhok:"(᥇᥇) ᤗᤠᤄᤧᤱᤒᤠ ᥆᥎:᥊᥋:᥊᥇ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KmissingL:"",
+	KnextL:"(᥇᥇) ᤗᤠᤘᤧᤶᤒᤠ",
+	KMangyuk:"(᥆᥈) ᤛᤔᤡ ᥇᥉:᥊᥈:᥇᥉ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KmissingM:"",
+	KnextM:"(᥆᥉) ᤐᤥᤔᤡ",
+	KSamyuk:"(᥆᥎) ᤁᤢᤜᤢ᤹ᤗᤠᤒᤠ ᥆᥍:᥊᥊:᥇᥋ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KmissingS:"(᥆᥏) ᤋᤱᤘᤠᤒᤠ ᥈᥎:᥈᥆:᥈᥉ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KnextS:"(᥇᥆) ᤁᤍᤠᤗᤠᤒᤠ",
+	KKhok:"(᥆᥍) ᤗᤠᤜᤠ᤹ᤛᤥᤛᤡᤱ ᥆᥎:᥊᥋:᥊᥇ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KKhok2:"(᥆᥇) ᤗᤠᤜᤠᤱᤛᤡ ᥇᥏:᥇᥏:᥋᥆ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KHangHangwa:"(᥇᥆) ᤕᤠᤶᤍᤢᤱ ᥇᥉:᥊᥈:᥇᥉ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KnextH:"(᥆᥍) ᤏᤢᤕᤧᤴᤜᤡᤍᤠ",
+	KLabhrang:"ᤗᤠᤏᤢᤵᤐᤠ",
+	KmoonSign:"♈ ᤀᤏᤠᤶ ᥇᥏:᥇᥇:᥈᥎ ᤕᤧᤶᤍᤠᤖᤡᤰ",
+	KnextmoonS:"♉ ᤘᤰᤗᤠ",
+	KsunSign:"♊ ᤁᤏᤠᤶ",
+	KnextsunS:"",
+	KSunMangyuk:"(᥆᥍) ᤛᤠᤶᤛᤪᤡ",
+	KYemPhakmura:"",
+	KGulikaKala:"",
+	KYamagandaKala:"",
+	KDurMuhurta:"",
+	KnextDur:"",
+	KSammangMura:"",
+	KMidhungYangdhok:"",
+	KHangsamYangdhok:"",
+	KAkwanamangSikkum:"",
+	KNagaSikkum:"",
+	KSinglaSikkum:"",
+	KSinglaYangdhok:"",
+	KChrangYangdhok:"",
+	KPhakmuraYangdhok:"",
+	KPisangTangba:"",
+	KMangyukTangba:"",
+	KSariKap:"",
+	KSunRise:"",
+	KSunSet:"",
+	KdayDuration:"",
+	KnightDuration:"",
+	KWanma:"",
+	KNamba:"",
+	KKaliYuga:"",
+	KBikramSambat:"",
+	KSakaSambat:"",
+	
+	KiratMonthYear:"Thakmeppa - Sisekpa, 5087",
+	KiratDate:"Thakmeppa 26, 5087",
+	day:"Friday",
+	KiratDay:"Phasuppa",
+	tLamikkhok:"Lanuppa - Laghengba",
+	Lamikkhok:"(25) Laghengba upto 08:45:42",
+	missingL:"",
+	nextL:"Lawemba",
+	Mangyuk:"(02) Sami upto 13:42:13",
+	missingM:"",
+	nextM:"Pomi",
+	Samyuk:"(08) Kuhalaba upto 07:44:16",
+	missingS:"(09) Tangwaba upto 28:20:23",
+	nextS:"(10) Kadalaba",
+	Khok:"(07) Lahasosing upto 08:45:42",
+	Khok2:"(01) Lahangsing upto 19:19:50",
+	HangHangwa:"(10) Yamdung upto 13:42:13",
+	nextH:"(07) Nuyenhida",
+	Labhrang:"Lanuppa",
+	moonSign:"♈ Anam - Aries upto 19:11:28",
+	nextmoonS:"♉ Wakla - Taurus",
+	sunSign:"♊ Kanam - Gemini",
+	nextsunS:"",
+	SunMangyuk:"(07) Samsri",
+	nextSM:"",
+	YemPhakmura:"",
+	GulikaKala:"",
+	YamagandaKala:"",
+	DurMuhurta:"",
+	nextDur:"",
+	SammangMura:"",
+	MidhungYangdhok:"",
+	HangsamYangdhok:"",
+	AkwanamangSikkum:"",
+	NagaSikkum:"",
+	SinglaSikkum:"",
+	SinglaYangdhok:"",
+	ChrangYangdhok:"",
+	PhakmuraYangdhok:"",
+	PisangTangba:"",
+	MangyukTangba:"",
+	SariKap:"",
+	SunRise:"",
+	SunSet:"",
+	dayDuration:"",
+	nightDuration:"",
+	Wanma:"",
+	Namba:"",
+	KaliYuga:"",
+	BikramSambat:"",
+	SakaSambat:"",
+},	
+	"2026-03-11":{
+		nextL:"Lawemba",
+		nextM:"Pomi",
+	},	
+	"2026-02-12":{
+		nextL:"Lawemba",
+		nextM:"Pomi",
+	},	
+	"2026-01-13":{
+		nextL:"Lawemba",
+		nextM:"Pomi",
+	},	
+	"2026-07-14":{
+		nextL:"Lawemba",
+		nextM:"Pomi",
+	},	
+
+/* PANCHANGA ENDS HERE */
+};
+
+/* KIRAT RULES */
+const kiratRules={
+	2000: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:18, reset:14},4:{start:19, reset:13},5:{start:19, reset:14},6:{start:19, reset:15},7:{start:17, reset:16},8:{start:17, reset:17},9:{start:16, reset:17},10:{start:15, reset:17},11:{start:16, reset:16},12:{start:16, reset:16}},
+	2001: {1:{start:17, reset:14},2:{start:19, reset:12},3:{start:18, reset:14},4:{start:19, reset:14},5:{start:18, reset:14},6:{start:19, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:17},11:{start:16, reset:16},12:{start:16, reset:16}},
+	2002: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:14},4:{start:19, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2003: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2004: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:18, reset:14},4:{start:19, reset:13},5:{start:19, reset:14},6:{start:19, reset:15},7:{start:17, reset:16},8:{start:17, reset:17},9:{start:16, reset:17},10:{start:15, reset:17},11:{start:16, reset:16},12:{start:16, reset:16}},
+	2005: {1:{start:17, reset:14},2:{start:19, reset:12},3:{start:18, reset:14},4:{start:19, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:16},12:{start:16, reset:16}},
+	2006: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:14},4:{start:19, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2007: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2008: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:18, reset:14},4:{start:19, reset:13},5:{start:19, reset:14},6:{start:19, reset:15},7:{start:17, reset:16},8:{start:17, reset:17},9:{start:16, reset:17},10:{start:15, reset:17},11:{start:16, reset:16},12:{start:16, reset:16}},
+	2009: {1:{start:17, reset:14},2:{start:19, reset:12},3:{start:18, reset:14},4:{start:19, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:16},12:{start:16, reset:16}},
+	2010: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2011: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2012: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:18, reset:14},4:{start:19, reset:13},5:{start:19, reset:14},6:{start:19, reset:15},7:{start:17, reset:16},8:{start:17, reset:17},9:{start:16, reset:17},10:{start:15, reset:17},11:{start:16, reset:16},12:{start:16, reset:16}},
+	2013: {1:{start:17, reset:14},2:{start:19, reset:12},3:{start:18, reset:14},4:{start:19, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:16},12:{start:16, reset:16}},
+	2014: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2015: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:16},7:{start:16, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2016: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:18, reset:14},4:{start:19, reset:13},5:{start:19, reset:14},6:{start:19, reset:15},7:{start:17, reset:16},8:{start:17, reset:17},9:{start:16, reset:17},10:{start:15, reset:17},11:{start:16, reset:16},12:{start:16, reset:16}},
+	2017: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:14},4:{start:19, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:16},12:{start:16, reset:16}},
+	2018: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2019: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:16},7:{start:16, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:17}},
+	2020: {1:{start:16, reset:15},2:{start:18, reset:13},3:{start:18, reset:14},4:{start:19, reset:13},5:{start:19, reset:14},6:{start:19, reset:15},7:{start:17, reset:16},8:{start:17, reset:17},9:{start:16, reset:17},10:{start:15, reset:17},11:{start:16, reset:16},12:{start:16, reset:16}},
+	2021: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:14},4:{start:19, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2022: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2023: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:16},7:{start:16, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:17}},
+	2024: {1:{start:16, reset:15},2:{start:18, reset:13},3:{start:18, reset:14},4:{start:19, reset:13},5:{start:19, reset:14},6:{start:19, reset:15},7:{start:17, reset:16},8:{start:17, reset:17},9:{start:16, reset:17},10:{start:15, reset:17},11:{start:16, reset:16},12:{start:16, reset:16}},
+	2025: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:14},4:{start:19, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2026: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2027: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:16},7:{start:16, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:17}},
+	2028: {1:{start:16, reset:15},2:{start:18, reset:13},3:{start:18, reset:14},4:{start:19, reset:14},5:{start:18, reset:14},6:{start:19, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:17},11:{start:16, reset:16},12:{start:16, reset:16}},
+	2029: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:14},4:{start:19, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2030: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2031: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:16},7:{start:16, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:17}},
+	2032: {1:{start:16, reset:15},2:{start:18, reset:13},3:{start:18, reset:14},4:{start:19, reset:14},5:{start:18, reset:14},6:{start:19, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:17},11:{start:16, reset:16},12:{start:16, reset:16}},
+	2033: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:14},4:{start:19, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2034: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2035: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:16},7:{start:16, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:17}},
+	2036: {1:{start:16, reset:15},2:{start:18, reset:13},3:{start:18, reset:14},4:{start:19, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:16},12:{start:16, reset:16}},
+	2037: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2038: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2039: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:16},7:{start:16, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:17}},
+	2040: {1:{start:16, reset:15},2:{start:18, reset:13},3:{start:18, reset:14},4:{start:19, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:16},12:{start:16, reset:16}},
+	2041: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2042: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:16},7:{start:16, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2043: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:16},7:{start:16, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:17}},
+	2044: {1:{start:16, reset:15},2:{start:18, reset:14},3:{start:17, reset:14},4:{start:19, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:16},12:{start:16, reset:16}},
+	2045: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2046: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:16},7:{start:16, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:17}},
+	2047: {1:{start:16, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:16},7:{start:16, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:17}},
+	2048: {1:{start:16, reset:15},2:{start:18, reset:14},3:{start:17, reset:14},4:{start:19, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2049: {1:{start:17, reset:14},2:{start:19, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:15},7:{start:17, reset:17},8:{start:16, reset:17},9:{start:16, reset:17},10:{start:15, reset:18},11:{start:15, reset:17},12:{start:15, reset:16}},
+	2050: {1:{start:17, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:16},7:{start:16, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:17}},
+	2051: {1:{start:16, reset:15},2:{start:18, reset:13},3:{start:17, reset:15},4:{start:18, reset:14},5:{start:18, reset:15},6:{start:18, reset:16},7:{start:16, reset:17},8:{start:16, reset:18},9:{start:15, reset:18},10:{start:14, reset:18},11:{start:15, reset:17},12:{start:15, reset:17}},
+};
+
+function getKiratDate(y,m,d){
+const r=kiratRules[y]?.[m];
+if(!r)return"";
+return d<r.reset ? r.start+d-1 : d-r.reset+1;
+}
+
+
+/* ============ THEME ============ */
+let currentTheme = "day"; /* 'day' or 'night' */
+
+function applyTheme(theme){
+    currentTheme = theme;
+    document.body.classList.toggle("night-theme", theme === "night");
+    const btn = document.getElementById("themeToggleBtn");
+    if(btn){
+        btn.textContent = theme === "night" ? "☀️ Day" : "🌙 Night";
+    }
+}
+
+function toggleTheme(){
+    applyTheme(currentTheme === "day" ? "night" : "day");
+}
+
+/* ============ TODAY INFO ============ */
+const today=new Date();
+let selectedDate = new Date(); /* current active date */
+
+function updateTodayInfo(){
+
+    const now = selectedDate;
+
+    const key =
+    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+
+    const p = panchangaData[key];
+
+    document.getElementById("todayInfo").innerHTML = `
+        <div>
+            ${now.toLocaleDateString("en-US",{
+                weekday:"long",
+                day:"numeric",
+                month:"long",
+                year:"numeric"
+            })} (Surise Time)
+        </div>
+
+        <div style="margin-top:5px;font-size:14px;color:inherit;">
+            <b>${p?.KiratDate || "-"}</b>
+        </div>
+
+        <div style="margin-top:3px;font-size:14px;color:inherit;">
+            <b>${p?.tLamikkhok || "-"}</b>
+        </div>
+
+        <div style="margin-top:3px;font-size:14px;color:inherit;">
+            <b>${new Date().toLocaleTimeString()}</b>
+        </div>
+
+        <div style="font-size:13px;color:#888;margin-top:4px;">
+            Thimphu, Bhutan
+        </div>
+    `;
+}
+
+/* Update Today's Information */
+updateTodayInfo(selectedDate);
+setInterval(updateTodayInfo,1000);
+
+/* INIT */
+let currentMonth=today.getMonth();
+let currentYear=today.getFullYear();
+
+/* SELECTS */
+const monthSelect=document.getElementById("monthSelect");
+const yearSelect=document.getElementById("yearSelect");
+
+months.forEach((m,i)=>monthSelect.innerHTML+=`<option value="${i}">${m}</option>`);
+for(let y=2000;y<=2050;y++)yearSelect.innerHTML+=`<option value="${y}">${y}</option>`;
+
+monthSelect.value=currentMonth;
+yearSelect.value=currentYear;
+
+/* ============ DETAIL PANEL BUILDERS ============ */
+/* Builds the Kirat-language info box (info1) and the English info box (info2)
+   for a given year/month/day, and injects them into the page. */
+function showDayDetails(year, month, d){
+
+    selectedDate = new Date(year, month, d);
+    updateTodayInfo();
+
+    const key=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const p=panchangaData[key];
+
+    const info1 = `
+<h3 id="slideUpMarker" style="font-size:20px;color:#9900ff;text-align:center;font-family:'XenoType LIF Ilam';">
+ᤁᤡᤖᤠᤋ᤻ ᤕᤧᤴᤗᤥ
+</h3>
+
+<table class="details-table" style="font-family:'XenoType LIF Ilam';">
+	<tr><th>ᤁᤡᤖᤠᤋ᤻ ᤕᤧᤴᤏᤡᤳ:</th><td>${p?.KKiratDate||"-"}</td></tr>
+	<tr><th>ᤗᤠᤔᤡᤰᤂᤥᤰ:</th><td>${p?.KLamikkhok||"-"}<p>${p?.KmissingL||""}<p>${p?.KnextL||"-"}</td></tr>
+	<tr><th>ᤔᤠᤱᤕᤢᤰ:</th><td>${p?.KMangyuk||"-"}<p>${p?.KmissingM||""}<p>${p?.KnextM||"-"}</td></tr>
+	<tr><th>ᤛᤠᤶᤕᤢᤰ:</th><td>${p?.KSamyuk||"-"}<p>${p?.KmissingS||""}<p>${p?.KnextS||"-"}</td></tr>
+	<tr><th>ᤂᤥᤰ:</th><td>${p?.KKhok||"-"}<p>${p?.KKhok2||"-"}</td></tr>
+	<tr><th>ᤁᤡᤖᤠᤋ᤻ ᤕᤧᤴ:</th><td>${p?.KKiratDay||"-"}</td></tr>
+	<tr><th>ᤜᤠᤱᤜᤠᤱᤘᤠ:</th><td>${p?.KHangHangwa||"-"}<p>${p?.KnextH||"-"}</td></tr>
+	<tr><th>ᤗᤠᤓᤪᤧᤱ:</th><td>${p?.KLabhrang||"-"}</td></tr>
+</table>
+<table class="details-table" style="font-family:'XenoType LIF Ilam';">
+	<tr><th>ᤛᤡᤱᤗᤠᤒᤠ ᤋᤡᤳᤗᤢᤶ:</th><td>${p?.KmoonSign||"-"}<p>${p?.KnextmoonS||""}</td></tr>
+	<tr><th>ᤌᤢᤱᤎᤠᤱᤒᤠ ᤋᤡᤳᤗᤢᤶ:</th><td>${p?.KsunSign||"-"}<p>${p?.KnextsunS||""}</td></tr>
+	<tr><th>ᤌᤢᤱᤎᤠᤱᤒᤠ ᤔᤠᤱᤕᤢᤰ:</th><td>${p?.KSunMangyuk||"-"}<p>${p?.KnextSM||""}</td></tr>
+</table>
+<table class="details-table">
+	<tr><th>Sunrise:</th><td>🕒 ${p?.SunRise||"-"}</td></tr>
+	<tr><th>Sunset:</th><td>🕒 ${p?.SunSet||"-"}</td></tr>
+	<tr><th>Kirat Wanma:</th><td>${p?.Wanma||"-"}</td></tr>
+	<tr><th>Kirat Namba</th><td>${p?.Namba||"-"}</td></tr>
+</table>
+<table class="details-table">
+	<tr><th>Yem Phakmura:</th><td>${p?.YemPhakmura||"-"}</td></tr>
+	<tr><th>Gulika Kala:</th><td>${p?.GulikaKala||"-"}</td></tr>
+	<tr><th>Yamaganda Kala:</th><td>${p?.YamagandaKala||"-"}</td></tr>
+	<tr><th>Dur Muhurta:</th><td>${p?.DurMuhurta||"-"}<br>${p?.nextDur||""}</td></tr>
+</table>
+<table class="details-table">
+	<tr><th>Sammang Mura:</th><td>${p?.SammangMura||"-"}<p>${p?.nextSM||""}</td></tr>
+	<tr><th>Midhung Yangdhok:</th><td>${p?.MidhungYangdhok||"-"}</td></tr>
+	<tr><th>Hangsam Yangdhok:</th><td>${p?.HangsamYangdhok||"-"}</td></tr>
+	<tr><th>Akwanamang Pisang Sikkum:</th><td>${p?.AkwanamangSikkum||"-"}</td></tr>
+	<tr><th>Naga Pisang Sikkum:</th><td>${p?.NagaSikkum||"-"}</td></tr>
+	<tr><th>Singlaba Sikkum:</th><td>${p?.SinglaSikkum||"-"}</td></tr>
+	<tr><th>Singlaba Yangdhok:</th><td>${p?.SinglaYangdhok||"-"}</td></tr>
+	<tr><th>Chrang Yangdhok:</th><td>${p?.ChrangYangdhok||"-"}</td></tr>
+	<tr><th>Pisang Tangba:</th><td>${p?.PisangTangba||"-"}</td></tr>
+	<tr><th>Mangyuk Tangba:</th><td>${p?.MangyukTangba||"-"}</td></tr>
+	<tr><th>Sari Kap:</th><td>${p?.Sarikap||"-"}</td></tr>
+</table>
+<table class="details-table">
+	<tr><th>Phowa Tangbe:</th><td>${p?.KaliYuga||"-"}</td></tr>
+	<tr><th>Bikram Sambat:</th><td>${p?.BikramSambat||"-"}</td></tr>
+	<tr><th>Saka Sambat:</th><td>${p?.SakaSambat||"-"}</td></tr>
+</table>
+${buildYenyemTable(p)}
+${buildSenlendatTable(p)}
+${buildNotesTable()}
+`;
+
+    const info2 = `
+<h3 style="font-size:20px;color:#9900ff;text-align:center;">
+${p?.day || "-"}, ${d} ${months[month]} ${year}
+</h3>
+<table class="details-table">
+	<tr><th>Kirat Date:</th><td>${p?.KiratDate||"-"}</td></tr>
+	<tr><th>Lamikkhok:</th><td>${p?.Lamikkhok||"-"}<p>${p?.missingL||""}<p>${p?.nextL||"-"}</td></tr>
+	<tr><th>Mangyuk:</th><td>${p?.Mangyuk||"-"}<p>${p?.nextM||"-"}</td></tr>
+	<tr><th>Samyuk:</th><td>${p?.Samyuk||"-"}<p>${p?.nextS||"-"}</td></tr>
+	<tr><th>Khok:</th><td>${p?.Khok||"-"}<br>${p?.Khok2||"-"}</td></tr>
+	<tr><th>Kirat Day:</th><td>${p?.KiratDay||"-"}</td></tr>
+	<tr><th>Hanghangwa:</th><td>${p?.HangHangwa||"-"}<p>${p?.nextH||"-"}</td></tr>
+	<tr><th>Labhrang:</th><td>${p?.Labhrang||"-"}</td></tr>
+</table>
+<table class="details-table">
+	<tr><th>Moon Sign</th><td>${p?.moonSign||"-"}<p>${p?.nextmoonS||""}</td></tr>
+	<tr><th>Sun Sign</th><td>${p?.sunSign||"-"}<p>${p?.nextsunS||""}</td></tr>
+	<tr><th>Sun Mangyuk</th><td>${p?.SunMangyuk||"-"}<p>${p?.nextSM||""}</td></tr>
+</table>
+<table class="details-table">
+	<tr><th>Sunrise:</th><td>🕒 ${p?.SunRise||"-"}</td></tr>
+	<tr><th>Sunset:</th><td>🕒 ${p?.SunSet||"-"}</td></tr>
+	<tr><th>Kirat Wanma:</th><td>${p?.Wanma||"-"}</td></tr>
+	<tr><th>Kirat Namba</th><td>${p?.Namba||"-"}</td></tr>
+</table>
+<table class="details-table">
+	<tr><th>Yem Phakmura:</th><td>${p?.YemPhakmura||"-"}</td></tr>
+	<tr><th>Gulika Kala:</th><td>${p?.GulikaKala||"-"}</td></tr>
+	<tr><th>Yamaganda Kala:</th><td>${p?.YamagandaKala||"-"}</td></tr>
+	<tr><th>Dur Muhurta:</th><td>${p?.DurMuhurta||"-"}<br>${p?.nextDur||""}</td></tr>
+</table>
+<table class="details-table">
+	<tr><th>Sammang Mura:</th><td>${p?.SammangMura||"-"}<p>${p?.nextSM||""}</td></tr>
+	<tr><th>Midhung Yangdhok:</th><td>${p?.MidhungYangdhok||"-"}</td></tr>
+	<tr><th>Hangsam Yangdhok:</th><td>${p?.HangsamYangdhok||"-"}</td></tr>
+	<tr><th>Akwanamang Pisang Sikkum:</th><td>${p?.AkwanamangSikkum||"-"}</td></tr>
+	<tr><th>Naga Pisang Sikkum:</th><td>${p?.NagaSikkum||"-"}</td></tr>
+	<tr><th>Singlaba Sikkum:</th><td>${p?.SinglaSikkum||"-"}</td></tr>
+	<tr><th>Singlaba Yangdhok:</th><td>${p?.SinglaYangdhok||"-"}</td></tr>
+	<tr><th>Chrang Yangdhok:</th><td>${p?.ChrangYangdhok||"-"}</td></tr>
+	<tr><th>Pisang Tangba:</th><td>${p?.PisangTangba||"-"}</td></tr>
+	<tr><th>Mangyuk Tangba:</th><td>${p?.MangyukTangba||"-"}</td></tr>
+	<tr><th>Sari Kap:</th><td>${p?.Sarikap||"-"}</td></tr>
+</table>
+<table class="details-table">
+	<tr><th>Phowa Tangbe:</th><td>${p?.KaliYuga||"-"}</td></tr>
+	<tr><th>Bikram Sambat:</th><td>${p?.BikramSambat||"-"}</td></tr>
+	<tr><th>Saka Sambat:</th><td>${p?.SakaSambat||"-"}</td></tr>
+</table>
+${buildYenyemTable(p)}
+${buildSenlendatTable(p)}
+${buildNotesTable()}
+`;
+
+    document.getElementById("infoBox1").innerHTML = info1;
+    document.getElementById("infoBox2").innerHTML = info2;
+}
+
+function buildYenyemTable(p){
+    let rows = "";
+    for(let i=1;i<=8;i++){
+        rows += `<tr><th>${p?.["dayYemY"+i]||"-"}<p>${p?.["dayYemyEng"+i]||"-"}</th><td>🕒 ${p?.["dayYemYT"+i]||"-"}</td><td>${p?.["dayYemyResult"+i]||"-"}</td></tr>`;
+    }
+    let nightRows = "";
+    for(let i=1;i<=8;i++){
+        nightRows += `<tr><th>${p?.["nightYemY"+i]||"-"}<p>${p?.["nightYemyEng"+i]||"-"}</th><td>🕒 ${p?.["nightYemYT"+i]||"-"}</td><td>${p?.["nightYemyResult"+i]||"-"}</td></tr>`;
+    }
+    return `
+<table class="yenyem-details-table">
+	<tr><th colspan="3" style="font-size:18px;color:#9900ff; text-align:center;">Yenyem</th></tr>
+	<tr><th colspan="3" style="font-size:14px;color:#990099; text-align:center;">Day Yenyem (Lendat)</th></tr>
+	${rows}
+</table>
+<table class="yenyem-details-table">
+	<tr><th colspan="3" style="font-size:14px;color:#990099; text-align:center;">Night Yenyem (Sendat)</th></tr>
+	${nightRows}
+</table>`;
+}
+
+function buildSenlendatTable(p){
+    let dayRows = "";
+    for(let i=1;i<=12;i++){
+        dayRows += `<tr><th>${p?.["daySenlen"+i]||"-"}</th><td>🕒 ${p?.["daySenlendatStart"+i]||"-"}</td><td>-</td><td>🕒 ${p?.["daySenlendatEnd"+i]||"-"}</td></tr>`;
+    }
+    let nightRows = "";
+    for(let i=1;i<=12;i++){
+        nightRows += `<tr><th>${p?.["nightSenlen"+i]||"-"}</th><td>🕒 ${p?.["nightSenlendatStart"+i]||"-"}</td><td>-</td><td>🕒 ${p?.["nightSenlendatEnd"+i]||"-"}</td></tr>`;
+    }
+    return `
+<table class="senlendat-details-table" style="width:100%; border-collapse:collapse; text-align:center;">
+	<tr><th colspan="4" style="font-size:18px;color:#9900ff; text-align:center;">Senlendat</th></tr>
+	<tr><th colspan="4" style="font-size:14px;color:#990099; text-align:center;">Day Senlendat</th></tr>
+	<tr><th style="width:30%;">Senlendat</th><th style="width:30%; text-align:center;">Start</th><th style="width:10%; text-align:center;">To</th><th style="width:30%; text-align:center;">End</th></tr>
+	${dayRows}
+</table>
+<table class="senlendat-details-table" style="width:100%; border-collapse:collapse; text-align:center;">
+	<tr><th colspan="4" style="font-size:14px;color:#990099; text-align:center;">Night Senlendat</th></tr>
+	<tr><th style="width:30%;">Senlendat</th><th style="width:30%; text-align:center;">Start</th><th style="width:10%; text-align:center;">To</th><th style="width:30%; text-align:center;">End</th></tr>
+	${nightRows}
+</table>`;
+}
+
+function buildNotesTable(){
+    return `
+<table class="details-table">
+	<tr><td><b>Notes:</b>
+		<ol style="padding:10px;">
+			<li>Kirat day is from Sunrise time to next day Sunrise time.</li>
+			<li>All Yenlon calculations use Sunrise time.</li>
+			<li>All the given times are in 24+ hour system (Example: 28:30 can be read as 04:30 AM of the next day.</li>
+		</ol>
+	</td></tr>
+</table>`;
+}
+
+/* Scrolls the page/viewport up until the "Slide up till here" marker
+   inside infoBox1 sits at the top of the viewport. */
+function slideUpToMarker(){
+    const marker = document.getElementById("slideUpMarker");
+    if(!marker) return;
+
+    const header = document.querySelector("header");
+    const todayInfo = document.getElementById("todayInfo");
+
+    const offset = (header ? header.offsetHeight : 0) +
+                   (todayInfo ? todayInfo.offsetHeight : 0);
+
+    const targetY = window.pageYOffset + marker.getBoundingClientRect().top - offset;
+
+    window.scrollTo({ top: Math.max(targetY, 0), behavior: "smooth" });
+}
+
+/* ============ REFERENCE / LEGEND TABLES (hamburger menu pages) ============ */
+
+/* Known Yenyem names and their English meaning (cycle of 7, the 8th slot
+   simply repeats the 1st — see dayYemY1..8 in panchangaData). */
+const yenyemLegend = [
+    {name:"Mangghu", meaning:"Nectar"},
+    {name:"Siya",    meaning:"Death"},
+    {name:"Pano",    meaning:"Auspicious"},
+    {name:"Tung",    meaning:"Illness"},
+    {name:"Mudo",    meaning:"Anxiety"},
+    {name:"Membupek",meaning:"Moving"},
+    {name:"Labo",    meaning:"Profit"}
+];
+
+/* Known Senlendat names and their governed activity (cycle of 7, repeating
+   across the 12 daily/nightly slots — see daySenlen1..12 in panchangaData). */
+const senlendatLegend = [
+    {name:"Singla", meaning:"All works Auspicious"},
+    {name:"Pung",   meaning:"Collection of Money"},
+    {name:"Payang", meaning:"Marriage"},
+    {name:"Khawa",  meaning:"War"},
+    {name:"Thung",  meaning:"Government work"},
+    {name:"Tung",   meaning:"Travel"},
+    {name:"Saya",   meaning:"Studies"}
+];
+
+function buildYamdhangsangLegendTable(){
+    let yenyemRows = "";
+    yenyemLegend.forEach(item=>{
+        yenyemRows += `<tr><th>${item.name}</th><td>${item.meaning}</td></tr>`;
+    });
+
+    let senlendatRows = "";
+    senlendatLegend.forEach(item=>{
+        senlendatRows += `<tr><th>${item.name}</th><td>${item.meaning}</td></tr>`;
+    });
+
+    return `
+<table class="yenyem-details-table">
+	<tr><th colspan="2" style="font-size:18px;color:#9900ff; text-align:center;">Yenyem — Name &amp; Meaning</th></tr>
+	${yenyemRows}
+</table>
+<table class="senlendat-details-table">
+	<tr><th colspan="2" style="font-size:18px;color:#9900ff; text-align:center;">Senlendat — Name &amp; Governed Activity</th></tr>
+	${senlendatRows}
+</table>
+<p style="font-size:12px;color:#999966;margin-top:8px;">
+Note: each Yenyem/Senlendat period repeats through the day and night in the order shown above; check a specific date's detail panel for that day's exact timings.
+</p>`;
+}
+
+/* Known Kirat Rashi (moon/sun sign) name pairings encountered in the
+   Panchanga data. This list can be extended as more names are confirmed. */
+const kiratRashiLegend = [
+    {name:"Anam",   sign:"♈ Aries"},
+    {name:"Wakla",  sign:"♉ Taurus"},
+    {name:"Kanam",  sign:"♊ Gemini"},
+    {name:"Chakla", sign:"♓ Pisces"},
+    {name:"Phanam", sign:"♐ Sagittarius"}
+];
+
+function buildPlanetsLegendTable(){
+    let rows = "";
+    kiratRashiLegend.forEach(item=>{
+        rows += `<tr><th>${item.name}</th><td>${item.sign}</td></tr>`;
+    });
+
+    return `
+<table class="details-table">
+	<tr><th colspan="2" style="font-size:18px;color:#9900ff; text-align:center;">Kirat Rashi — Name &amp; Zodiac Sign</th></tr>
+	${rows}
+</table>
+<table class="details-table">
+	<tr><th>Kirat Wanma (Season)</th><td>Hangwanma — Grishma (Summer)</td></tr>
+	<tr><th>Kirat Namba (Weekday Ruler)</th><td>Thenamba</td></tr>
+</table>
+<p style="font-size:12px;color:#999966;margin-top:8px;">
+Note: this is a partial reference built from names seen in the Panchanga data so far; more Rashi, Wanma, and Namba names will be added as they are confirmed.
+</p>`;
+}
+
+/* ============ RENDER MONTH ============ */
+function renderCalendar(month,year){
+
+const days=document.getElementById("calendarDays");
+days.innerHTML="";
+
+const firstDayKey =
+`${year}-${String(month+1).padStart(2,'0')}-01`;
+
+const kiratMonth =
+panchangaData[firstDayKey]?.KiratMonthYear || "";
+
+document.getElementById("monthYear").innerHTML = `
+<div>${months[month]} ${year}</div>
+<div style="font-size:16px;margin-top:5px;">
+    ${kiratMonth}
+</div>
+`;
+
+const first=new Date(year,month,1).getDay();
+const total=new Date(year,month+1,0).getDate();
+
+for(let i=0;i<first;i++){
+days.innerHTML+="<div class='empty'></div>";
+}
+
+for(let d=1;d<=total;d++){
+
+const cell=document.createElement("div");
+cell.className="day";
+
+if(d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear()){
+cell.classList.add("today");
+}
+
+if(d===selectedDate.getDate()&&month===selectedDate.getMonth()&&year===selectedDate.getFullYear()){
+cell.classList.add("selected");
+}
+
+const k=getKiratDate(year,month+1,d);
+
+cell.innerHTML=`
+<div class="ad-date">${d}</div>
+<div class="kirat-date">${k}</div>
+`;
+
+cell.onclick=()=>{
+	showDayDetails(year, month, d);
+	renderCalendar(currentMonth, currentYear); /* refresh to move "selected" highlight */
+	slideUpToMarker();
+};
+
+days.appendChild(cell);
+}
+
+}
+
+/* ============ CONTROLS: prev / next / select ============ */
+function prevMonth(){
+currentMonth--;
+if(currentMonth<0){currentMonth=11;currentYear--;}
+monthSelect.value=currentMonth;
+yearSelect.value=currentYear;
+renderCalendar(currentMonth,currentYear);
+}
+
+function nextMonth(){
+currentMonth++;
+if(currentMonth>11){currentMonth=0;currentYear++;}
+monthSelect.value=currentMonth;
+yearSelect.value=currentYear;
+renderCalendar(currentMonth,currentYear);
+}
+
+monthSelect.onchange=()=>renderCalendar(currentMonth=+monthSelect.value,currentYear);
+yearSelect.onchange=()=>renderCalendar(currentMonth,currentYear=+yearSelect.value);
+
+/* ============ TODAY BUTTON ============ */
+function goToday(){
+    currentMonth = today.getMonth();
+    currentYear = today.getFullYear();
+    monthSelect.value = currentMonth;
+    yearSelect.value = currentYear;
+    renderCalendar(currentMonth, currentYear);
+    showDayDetails(currentYear, currentMonth, today.getDate());
+    renderCalendar(currentMonth, currentYear); /* refresh selected highlight */
+    window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* ============ SWIPE NAVIGATION ============ */
+(function initSwipe(){
+    const calendarEl = document.querySelector(".calendar");
+    if(!calendarEl) return;
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    calendarEl.addEventListener("touchstart", (e)=>{
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+    }, {passive:true});
+
+    calendarEl.addEventListener("touchend", (e)=>{
+        touchEndX = e.changedTouches[0].screenX;
+        touchEndY = e.changedTouches[0].screenY;
+        handleSwipeGesture();
+    }, {passive:true});
+
+    function handleSwipeGesture(){
+        const dx = touchEndX - touchStartX;
+        const dy = touchEndY - touchStartY;
+
+        /* Only treat as a horizontal swipe if the horizontal movement
+           dominates the vertical movement, and it's a decent distance */
+        if(Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5){
+            if(dx < 0){
+                nextMonth(); /* swipe left -> next month */
+            }else{
+                prevMonth(); /* swipe right -> previous month */
+            }
+        }
+    }
+})();
+
+/* ============ HAMBURGER MENU ============ */
+function toggleMenu(){
+    const menu = document.getElementById("dropdownMenu");
+    menu.classList.toggle("open");
+}
+
+document.addEventListener("click", function(event){
+    const menu = document.getElementById("dropdownMenu");
+    const button = document.querySelector(".menu-btn");
+    if(!menu.contains(event.target) && !button.contains(event.target)){
+        menu.classList.remove("open");
+    }
+});
+
+const pageContentData = {
+    about: {
+		title:"👤 About Us", body:"The Kirat Khaik Mundhum Calendar brings together the traditional Kirat lunar-solar reckoning and the modern Gregorian calendar in one place, so festivals, auspicious timings, and daily Panchanga details are easy to find and share."
+	},
+    yamdhangsang: {
+		title:"🕒 Yamdhangsang", body:"Yamdhangsang covers the time-keeping divisions used in the Kirat tradition — Lamikkhok, Mangyuk, Samyuk, Khok, Yenyem and Senlendat — each governing which activities are considered favourable at a given hour.",
+		table: buildYamdhangsangLegendTable
+	},
+    festivals: {
+		title:"🎉 Festivals", body:"A list of major Kirat festivals such as Sakela Ubhauli, Sakela Udhauli, and Chasok Tangnam will appear here, along with their dates on both the Kirat and English calendars."
+	},
+    planets: {
+		title:"🪐 Planets", body:"Details about the Kirat Namba (planetary rulers), Moon Sign, and Sun Sign positions used for daily Panchanga calculations.",
+		table: buildPlanetsLegendTable
+	},
+    contact: {
+		title:"📞 Contact Us", body:"For feedback, corrections, or questions about the Kirat Khaik Mundhum Calendar, please reach out through the contact details provided by the calendar's publisher."
+	}
+};
+
+function showPage(key){
+    document.getElementById("dropdownMenu").classList.remove("open");
+
+    if(key === "home"){
+        showHome();
+        return;
+    }
+
+    const data = pageContentData[key];
+    if(!data) return;
+
+    document.querySelector(".container").style.display = "none";
+
+    const pc = document.getElementById("pageContent");
+    pc.style.display = "block";
+    pc.innerHTML = `
+        <div class="page-content-inner">
+            <h2>${data.title}</h2>
+            <p>${data.body}</p>
+            ${data.table ? data.table() : ""}
+            <button class="back-btn" onclick="showHome()">◀ Back to Calendar</button>
+        </div>
+    `;
+    window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function showHome(){
+    document.getElementById("pageContent").style.display = "none";
+    document.getElementById("yearView").style.display = "none";
+    document.querySelector(".container").style.display = "block";
+}
+
+/* ============ YEAR VIEW ============ */
+let yearViewOpen = false;
+
+function toggleYearView(){
+    if(yearViewOpen){
+        showHome();
+        yearViewOpen = false;
+        return;
+    }
+
+    document.querySelector(".container").style.display = "none";
+    document.getElementById("pageContent").style.display = "none";
+
+    const yv = document.getElementById("yearView");
+    yv.style.display = "block";
+    yearViewOpen = true;
+
+    renderYearView(currentYear);
+    window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function renderYearView(year){
+    const yv = document.getElementById("yearView");
+
+    let html = `
+    <div class="year-view-header">
+        <button onclick="renderYearView(${year-1})">◀</button>
+        <h2>${year}</h2>
+        <button onclick="renderYearView(${year+1})">▶</button>
+        <button class="back-btn" onclick="showHome(); yearViewOpen=false;">◀ Back to Calendar</button>
+        <button id="saveYearPdfBtn" class="action-btn pdf-btn desktop-only" onclick="saveYearPDF()">⬇️ Save as PDF</button>
+    </div>
+    <div class="year-grid">
+    `;
+
+    for(let m=0; m<12; m++){
+        const first=new Date(year,m,1).getDay();
+        const total=new Date(year,m+1,0).getDate();
+        const firstDayKey = `${year}-${String(m+1).padStart(2,'0')}-01`;
+        const kiratMonth = panchangaData[firstDayKey]?.KiratMonthYear || "";
+
+        let cells = "";
+        for(let i=0;i<first;i++){ cells += `<span class="yv-empty"></span>`; }
+        for(let d=1; d<=total; d++){
+            const k = getKiratDate(year, m+1, d);
+            const isToday = (d===today.getDate() && m===today.getMonth() && year===today.getFullYear());
+            const dayKey = `${year}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const dp = panchangaData[dayKey];
+            cells += `<span class="yv-day${isToday?' yv-today':''}" onclick="jumpToDate(${year},${m},${d})">
+                <span class="yv-mangyuk">${dp?.nextM||""}</span>
+                <span class="yv-ad">${d}</span><span class="yv-kirat">${k}</span>
+                <span class="yv-lamikkhok">${dp?.nextL||""}</span>
+            </span>`;
+        }
+
+        html += `
+        <div class="year-month-card">
+            <div class="year-month-title">${months[m]}<br><small>${kiratMonth}</small></div>
+            <div class="year-month-weekdays">
+                <span><p style="font-family:'XenoType LIF Ilam';">ᤋᤧᤏᤧ</P>Sun</span>
+				<span><p style="font-family:'XenoType LIF Ilam';">ᤑᤥᤖᤠ</P>Mon</span>
+				<span><p style="font-family:'XenoType LIF Ilam';">ᤔᤡᤰ</P>Tue</span>
+				<span><p style="font-family:'XenoType LIF Ilam';">ᤂᤧᤰ</P>Wed</span>
+				<span><p style="font-family:'XenoType LIF Ilam';">ᤁᤢᤖᤢ</P>Thu</span>
+				<span><p style="font-family:'XenoType LIF Ilam';">ᤑᤛᤢᤵ</P>Fri</span>
+				<span><p style="font-family:'XenoType LIF Ilam';">ᤛᤧᤴ</P>Sat</span>
+            </div>
+            <div class="year-month-days">${cells}</div>
+        </div>`;
+    }
+
+    html += `</div>`;
+    yv.innerHTML = html;
+}
+
+function jumpToDate(year, month, d){
+    yearViewOpen = false;
+    document.getElementById("yearView").style.display = "none";
+    document.querySelector(".container").style.display = "block";
+
+    currentYear = year;
+    currentMonth = month;
+    monthSelect.value = currentMonth;
+    yearSelect.value = currentYear;
+    renderCalendar(currentMonth, currentYear);
+    showDayDetails(year, month, d);
+    renderCalendar(currentMonth, currentYear);
+    slideUpToMarker();
+}
+
+/* ============ SAVE PDF ============ */
+function loadScript(src){
+    return new Promise((resolve, reject)=>{
+        const s = document.createElement("script");
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+    });
+}
+
+let pdfLibsLoaded = false;
+
+async function ensurePdfLibs(){
+    if(pdfLibsLoaded) return;
+    if(typeof html2canvas === "undefined"){
+        await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+    }
+    if(typeof window.jspdf === "undefined"){
+        await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    }
+    pdfLibsLoaded = true;
+}
+
+async function savePDF(){
+    const btn = document.getElementById("savePdfBtn");
+    const originalText = btn.textContent;
+    btn.textContent = "Preparing...";
+    btn.disabled = true;
+
+    try{
+        await ensurePdfLibs();
+
+        const target = document.querySelector(".container");
+        const canvas = await html2canvas(target, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: currentTheme === "night" ? "#1a1a2e" : "#fff8dc"
+        });
+
+        const imgData = canvas.toDataURL("image/png");
+        const { jsPDF } = window.jspdf;
+
+        const pdfWidth = 210; /* A4 mm */
+        const pageHeight = 297;
+        const imgWidth = pdfWidth;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        const pdf = new jsPDF("p", "mm", "a4");
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        while(heightLeft > 0){
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+
+        const fname = `Kirat-Calendar-${months[currentMonth]}-${currentYear}.pdf`;
+        pdf.save(fname);
+
+    }catch(err){
+        console.error("PDF export failed:", err);
+        alert("Sorry, the PDF could not be generated. Please check your internet connection and try again.");
+    }finally{
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
+}
+
+async function saveYearPDF(){
+    const btn = document.getElementById("saveYearPdfBtn");
+    const originalText = btn ? btn.textContent : "";
+    if(btn){ btn.textContent = "Preparing..."; btn.disabled = true; }
+
+    try{
+        await ensurePdfLibs();
+
+        const target = document.getElementById("yearView");
+        const canvas = await html2canvas(target, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: currentTheme === "night" ? "#1a1a2e" : "#fff8dc"
+        });
+
+        const imgData = canvas.toDataURL("image/png");
+        const { jsPDF } = window.jspdf;
+
+        /* Landscape A4 fits the wide 6-column year grid better */
+        const pdfWidth = 297; /* A4 landscape mm */
+        const pageHeight = 210;
+        const imgWidth = pdfWidth;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        const pdf = new jsPDF("l", "mm", "a4");
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        while(heightLeft > 0){
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+        }
+
+        pdf.save(`Kirat-Calendar-Year-${currentYear}.pdf`);
+
+    }catch(err){
+        console.error("Year PDF export failed:", err);
+        alert("Sorry, the PDF could not be generated. Please check your internet connection and try again.");
+    }finally{
+        if(btn){ btn.textContent = originalText; btn.disabled = false; }
+    }
+}
+
+/* ============ START ============ */
+applyTheme("day");
+renderCalendar(currentMonth,currentYear);
+/* Auto-open today's details on load */
+showDayDetails(currentYear, currentMonth, today.getDate());
+renderCalendar(currentMonth,currentYear);
+
+</script>
+</body>
+</html>

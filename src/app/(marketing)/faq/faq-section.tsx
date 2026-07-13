@@ -35,12 +35,18 @@ const FAQS = [
   },
 ] as const;
 
-function FaqItem({ question, answer }: { question: string; answer: string }) {
+function FaqItem({ question, answer, index }: { question: string; answer: string; index: number }) {
   const [isOpen, setIsOpen] = useState(false);
   const contentId = useId();
 
   return (
-    <div className="border-b border-white/10 py-5">
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ type: "spring", stiffness: 120, damping: 18, delay: index * 0.06 }}
+      className="border-b border-border py-5"
+    >
       <button
         type="button"
         aria-expanded={isOpen}
@@ -66,13 +72,13 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
       >
         <p className="pt-3 text-sm text-muted-foreground">{answer}</p>
       </motion.div>
-    </div>
+    </motion.div>
   );
 }
 
 export function Faq() {
   return (
-    <section id="faq" className="relative mx-auto max-w-2xl px-6 py-28 sm:py-36">
+    <section className="relative mx-auto max-w-2xl px-6 py-28 sm:py-36">
       <motion.h2
         initial={{ opacity: 0, y: 14 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -84,8 +90,8 @@ export function Faq() {
       </motion.h2>
 
       <div className="mt-12">
-        {FAQS.map((faq) => (
-          <FaqItem key={faq.question} question={faq.question} answer={faq.answer} />
+        {FAQS.map((faq, index) => (
+          <FaqItem key={faq.question} question={faq.question} answer={faq.answer} index={index} />
         ))}
       </div>
     </section>

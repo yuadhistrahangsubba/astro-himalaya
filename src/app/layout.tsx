@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter, Instrument_Serif, Noto_Serif_Tibetan, Plus_Jakarta_Sans } from "next/font/google";
-import { CosmicBackground } from "@/components/marketing/cosmic-background";
 import { QueryProvider } from "@/providers/query-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import "./globals.css";
@@ -60,10 +59,7 @@ export default function RootLayout({
         className={`${display.variable} ${body.variable} ${denseUi.variable} ${tibetan.variable} font-sans antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <QueryProvider>
-            <CosmicBackground />
-            {children}
-          </QueryProvider>
+          <QueryProvider>{children}</QueryProvider>
         </ThemeProvider>
       </body>
     </html>

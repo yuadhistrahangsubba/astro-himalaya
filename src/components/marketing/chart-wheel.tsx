@@ -174,7 +174,10 @@ export function ChartWheel({ size = "lg", className }: ChartWheelProps) {
                       stroke="var(--color-gold)"
                       strokeOpacity={0.4}
                     />
-                    <text x={pos.x} y={pos.y - 20} textAnchor="middle" fontSize={11} fill="var(--foreground)">
+                    {/* The tooltip pill is always --color-ink (near-black) regardless of
+                        theme, so its label needs a fixed light color, not --foreground —
+                        which flips to near-black in the light theme and would vanish. */}
+                    <text x={pos.x} y={pos.y - 20} textAnchor="middle" fontSize={11} fill="var(--color-gold-bright)">
                       {planet.name}
                     </text>
                   </motion.g>

@@ -73,7 +73,7 @@ export function GlassCard({ children, className, floatDelay = 0 }: GlassCardProp
           animate={reducedMotion ? undefined : { rotate: 360 }}
           transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
         />
-        <div className="relative z-10 h-full rounded-[calc(1rem-1px)] border border-white/5 bg-card/85 p-6 shadow-2xl shadow-black/40 backdrop-blur-xl">
+        <div className="relative z-10 h-full rounded-[calc(1rem-1px)] border border-border/60 bg-card/85 p-6 shadow-2xl shadow-black/40 backdrop-blur-xl">
           {children}
         </div>
       </motion.div>
