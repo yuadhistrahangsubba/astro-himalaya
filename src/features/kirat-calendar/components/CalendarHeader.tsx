@@ -21,7 +21,7 @@ export function CalendarHeader({ onSelectHome, onSelectInfoPage }: CalendarHeade
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: "easeOut" }}
-        className="fixed inset-x-0 top-0 z-[10000] border-b border-border/60 bg-primary/92 py-3 backdrop-blur-xl shadow-[0_8px_30px_-12px_rgba(0,0,0,.35)]"
+        className="relative z-[10000] border-b border-border/60 bg-primary/92 py-3 backdrop-blur-xl shadow-[0_8px_30px_-12px_rgba(0,0,0,.35)]"
       >
         <div className="mx-auto flex max-w-5xl items-center gap-3 px-4">
           <motion.button

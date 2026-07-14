@@ -70,10 +70,10 @@ export function CalendarGrid({
   return (
     <div className={styles.calendar} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
       <div className={styles.monthTitle}>
-        <div>
+        <div className={styles.monthTitleMain}>
           {MONTHS[month]} {year}
         </div>
-        <div style={{ fontSize: 16, marginTop: 5 }}>{kiratMonth}</div>
+        {kiratMonth && <div className={styles.monthTitleSub}>{kiratMonth}</div>}
       </div>
 
       <div className={styles.weekdays}>
