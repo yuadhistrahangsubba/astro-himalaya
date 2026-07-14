@@ -16,7 +16,7 @@ export function DayDetailsPanel({ p, year, month, day }: DayDetailsPanelProps) {
       <div className={styles.infoBox}>
         <h3
           id="slideUpMarker"
-          style={{ fontSize: 20, color: "#9900ff", textAlign: "center", fontFamily: "'XenoType LIF Ilam'" }}
+          style={{ fontSize: 20, color: "var(--primary)", textAlign: "center", fontFamily: "'XenoType LIF Ilam'" }}
         >
           ᤁᤡᤖᤠᤋ᤻ ᤕᤧᤴᤗᤥ
         </h3>
@@ -107,7 +107,7 @@ export function DayDetailsPanel({ p, year, month, day }: DayDetailsPanelProps) {
       </div>
 
       <div className={styles.infoBox}>
-        <h3 style={{ fontSize: 20, color: "#9900ff", textAlign: "center" }}>
+        <h3 style={{ fontSize: 20, color: "var(--primary)", textAlign: "center" }}>
           {p?.day || "-"}, {day} {MONTHS[month]} {year}
         </h3>
         <table className={styles.detailsTable}>

@@ -110,6 +110,38 @@
   --chart-5:               oklch(0.45 0.13 230);
 }
 
+/* ── Night: calendar's own dark theme — neutral slate, muted gold ──
+   Distinct from the default :root "cosmos" identity (vivid gold on
+   near-black, used by /astro, /contact, /faq): this is a plainer,
+   lower-contrast dark theme purpose-built for the calendar's own night
+   mode, where the surrounding chrome shouldn't compete with the sky. */
+.night {
+  --background:            oklch(0.16 0.006 260);
+  --foreground:            oklch(0.93 0.004 260);
+  --card:                  oklch(0.21 0.008 260);
+  --card-foreground:       oklch(0.93 0.004 260);
+  --popover:               oklch(0.21 0.008 260);
+  --popover-foreground:    oklch(0.93 0.004 260);
+  --primary:               oklch(0.5 0.1 75);
+  --primary-foreground:    oklch(0.96 0.01 85);
+  --secondary:             oklch(0.26 0.01 260);
+  --secondary-foreground:  oklch(0.9 0.004 260);
+  --muted:                 oklch(0.24 0.008 260);
+  --muted-foreground:      oklch(0.65 0.006 260);
+  --accent:                oklch(0.5 0.1 75);
+  --accent-foreground:     oklch(0.96 0.01 85);
+  --destructive:           oklch(0.6 0.19 25);
+  --border:                oklch(0.93 0.004 260 / 10%);
+  --input:                 oklch(0.93 0.004 260 / 14%);
+  --ring:                  oklch(0.5 0.1 75 / 50%);
+
+  --chart-1:               oklch(0.5 0.1 75);
+  --chart-2:               oklch(0.6 0.17 300);
+  --chart-3:               oklch(0.68 0.13 200);
+  --chart-4:               oklch(0.62 0.18 340);
+  --chart-5:               oklch(0.5 0.11 230);
+}
+
 /* ── Base layer ───────────────────────────────────────────── */
 @layer base {
   * {

@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-import { CosmicBackground } from "@/components/marketing/cosmic-background";
+import { StarlitBackground } from "@/components/marketing/starlit-background";
 import { SunlitBackground } from "@/components/marketing/sunlit-background";
 import { PANCHANGA_DATA } from "../data/panchanga-data";
 import styles from "../kirat-calendar.module.css";
@@ -24,7 +24,7 @@ import { YearView } from "./YearView";
 // against these since the real backdrop is a fixed, blurred ambient layer
 // that sits outside the captured node. Matches this app's --background
 // token for each theme closely enough for a paper export.
-const NIGHT_BG = "#0d0d14";
+const NIGHT_BG = "#232326";
 const DAY_BG = "#f7f4ee";
 
 const INFO_PAGE_KEYS: InfoPageKey[] = ["about", "yamdhangsang", "festivals", "planets"];
@@ -138,7 +138,7 @@ export function KiratCalendar() {
   ).padStart(2, "0")}`;
   const selectedPanchanga = PANCHANGA_DATA[selectedKey];
 
-  const rootClassName = `${styles.calendarRoot} ${theme === "day" ? "light" : ""}`;
+  const rootClassName = `${styles.calendarRoot} ${theme === "day" ? "light" : "night"}`;
   const viewTransition = {
     initial: { opacity: 0, y: 12 },
     animate: { opacity: 1, y: 0 },
@@ -148,7 +148,7 @@ export function KiratCalendar() {
 
   return (
     <div className={rootClassName}>
-      {theme === "day" ? <SunlitBackground /> : <CosmicBackground />}
+      {theme === "day" ? <SunlitBackground /> : <StarlitBackground />}
 
       <CalendarHeader onSelectHome={() => setViewMode("calendar")} onSelectInfoPage={handleSelectInfoPage} />
       <PageTopicHeader />

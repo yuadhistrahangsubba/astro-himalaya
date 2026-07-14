@@ -1,12 +1,11 @@
 /**
  * Ported from calendar_v1.html, then rebuilt on the app's own design
- * tokens instead of hardcoded hex. `.calendarRoot` is wrapped in the
- * app's `.light` theme class for day mode (warm "bronze on vellum"
- * tokens) and left unwrapped for night mode, which falls through to the
- * site's default dark cosmic tokens — the exact same palette /astro,
- * /contact and /faq use. That single switch is what re-themes every
- * `var(--...)` reference below; there is intentionally no separate
- * `.night` color block anymore.
+ * tokens instead of hardcoded hex. `.calendarRoot` is wrapped in `.light`
+ * for day mode (warm "bronze on vellum" tokens) and `.night` for night
+ * mode (a plain, muted dark slate theme defined in globals.css) — the
+ * calendar's own dark theme, distinct from the vivid gold-on-cosmic
+ * `:root` default that /astro, /contact and /faq use. That single class
+ * switch is what re-themes every `var(--...)` reference below.
  */
 
 .calendarRoot{
