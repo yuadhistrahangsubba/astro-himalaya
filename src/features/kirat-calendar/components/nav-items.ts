@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Clock, Compass, HelpCircle, Home, Orbit, PartyPopper, Phone, User } from "lucide-react";
+import { Clock, Code, Compass, HelpCircle, Home, Orbit, PartyPopper, Phone, User } from "lucide-react";
 
 import type { InfoPageKey } from "../types";
 
@@ -46,6 +46,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { kind: "route", href: "/astro", label: "Astro", icon: Compass },
       { kind: "route", href: "/contact", label: "Contact Us", icon: Phone },
       { kind: "route", href: "/faq", label: "FAQ", icon: HelpCircle },
+      { kind: "route", href: "/developer", label: "Developer", icon: Code },
     ],
   },
   {
