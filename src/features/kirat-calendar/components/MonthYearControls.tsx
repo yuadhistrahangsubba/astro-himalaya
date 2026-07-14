@@ -4,8 +4,13 @@ import { motion } from "motion/react";
 
 import { MONTHS } from "../data/months";
 import styles from "../kirat-calendar.module.css";
+import { Dropdown } from "./Dropdown";
 
-const YEAR_RANGE = Array.from({ length: 2050 - 2000 + 1 }, (_, i) => 2000 + i);
+const MONTH_OPTIONS = MONTHS.map((m, i) => ({ value: i, label: m }));
+const YEAR_OPTIONS = Array.from({ length: 2050 - 2000 + 1 }, (_, i) => {
+  const y = 2000 + i;
+  return { value: y, label: String(y) };
+});
 
 interface MonthYearControlsProps {
   month: number;
@@ -29,20 +34,10 @@ export function MonthYearControls({
       <motion.button whileTap={{ scale: 0.9 }} onClick={onPrevMonth} aria-label="Previous month">
         ◀
       </motion.button>
-      <select value={month} onChange={(e) => onSelectMonth(Number(e.target.value))}>
-        {MONTHS.map((m, i) => (
-          <option key={m} value={i}>
-            {m}
-          </option>
-        ))}
-      </select>
-      <select value={year} onChange={(e) => onSelectYear(Number(e.target.value))}>
-        {YEAR_RANGE.map((y) => (
-          <option key={y} value={y}>
-            {y}
-          </option>
-        ))}
-      </select>
+
+      <Dropdown value={month} options={MONTH_OPTIONS} onChange={onSelectMonth} ariaLabel="Select month" />
+      <Dropdown value={year} options={YEAR_OPTIONS} onChange={onSelectYear} ariaLabel="Select year" />
+
       <motion.button whileTap={{ scale: 0.9 }} onClick={onNextMonth} aria-label="Next month">
         ▶
       </motion.button>
