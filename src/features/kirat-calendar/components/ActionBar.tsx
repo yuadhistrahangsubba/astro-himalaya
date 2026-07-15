@@ -12,6 +12,8 @@ interface ActionBarProps {
   onToggleYearView: () => void;
   onSavePdf: () => void;
   isExportingPdf: boolean;
+  onSaveYearPdf: () => void;
+  isExportingYearPdf: boolean;
 }
 
 export function ActionBar({
@@ -21,6 +23,8 @@ export function ActionBar({
   onToggleYearView,
   onSavePdf,
   isExportingPdf,
+  onSaveYearPdf,
+  isExportingYearPdf,
 }: ActionBarProps) {
   return (
     <div className={styles.actionBar}>
@@ -40,6 +44,14 @@ export function ActionBar({
         disabled={isExportingPdf}
       >
         {isExportingPdf ? "Preparing..." : "⬇️ Save PDF"}
+      </motion.button>
+      <motion.button
+        whileTap={{ scale: 0.94 }}
+        className={styles.actionBtn}
+        onClick={onSaveYearPdf}
+        disabled={isExportingYearPdf}
+      >
+        {isExportingYearPdf ? "Preparing..." : "⬇️ Save Year PDF"}
       </motion.button>
     </div>
   );

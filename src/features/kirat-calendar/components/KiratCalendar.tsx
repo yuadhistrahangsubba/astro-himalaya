@@ -18,6 +18,7 @@ import { InfoPage } from "./InfoPage";
 import { MonthYearControls } from "./MonthYearControls";
 import { PageTopicHeader } from "./PageTopicHeader";
 import { TodayInfoBar } from "./TodayInfoBar";
+import { YearGrid } from "./YearGrid";
 import { YearView } from "./YearView";
 
 // Approximate flat fills for PDF export only — html2canvas rasterizes
@@ -42,7 +43,13 @@ export function KiratCalendar() {
   const [isExportingYearPdf, setIsExportingYearPdf] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const yearViewRef = useRef<HTMLDivElement>(null);
+  // An always-mounted (but off-screen) export node — a static branded
+  // banner + the year grid, no interactive nav controls (they mean
+  // nothing inside an exported PDF). Both the Year View's own "Save as
+  // PDF" and the month view's "Save Year PDF" target this same node, so
+  // every year export looks identical regardless of which button
+  // triggered it.
+  const yearExportRef = useRef<HTMLDivElement>(null);
 
   // Defer "current time"-dependent rendering to the client only, avoiding
   // any risk of a server/client hydration mismatch across a day boundary.
@@ -113,11 +120,11 @@ export function KiratCalendar() {
   }
 
   async function handleSaveYearPdf() {
-    if (!yearViewRef.current) return;
+    if (!yearExportRef.current) return;
     setIsExportingYearPdf(true);
     try {
       await saveYearPdf(
-        yearViewRef.current,
+        yearExportRef.current,
         theme === "night" ? NIGHT_BG : DAY_BG,
         `Kirat-Calendar-Year-${currentYear}.pdf`,
       );
@@ -174,6 +181,8 @@ export function KiratCalendar() {
               onToggleYearView={() => setViewMode("year")}
               onSavePdf={handleSavePdf}
               isExportingPdf={isExportingPdf}
+              onSaveYearPdf={handleSaveYearPdf}
+              isExportingYearPdf={isExportingYearPdf}
             />
 
             <AnimatePresence mode="wait">
@@ -225,7 +234,6 @@ export function KiratCalendar() {
               onJumpToDate={handleJumpToDate}
               onSaveYearPdf={handleSaveYearPdf}
               isExportingYearPdf={isExportingYearPdf}
-              yearViewRef={yearViewRef}
             />
           </motion.div>
         )}
@@ -239,6 +247,27 @@ export function KiratCalendar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Off-screen, always-mounted export target for every "Save Year
+          PDF" trigger (the Year View's own button and the month view's
+          button both use it) — a static branded banner instead of the
+          interactive nav row (prev/next year, back, save), none of which
+          mean anything inside an exported document. Needs an explicit
+          width: `.yearView` is `width:92%`, and without a definite width
+          on this fixed-position wrapper that percentage resolves against
+          an auto/shrink-to-fit box instead of a real viewport-like
+          width, collapsing the grid to far fewer columns than it
+          actually renders with. */}
+      <div
+        aria-hidden="true"
+        style={{ position: "fixed", top: 0, left: "-9999px", width: 1400, pointerEvents: "none" }}
+      >
+        <div ref={yearExportRef} className={styles.yearView}>
+          <PageTopicHeader />
+          <p className="py-3 text-center font-sans text-2xl font-bold text-primary">{currentYear}</p>
+          <YearGrid year={currentYear} today={today} animate={false} />
+        </div>
+      </div>
 
       <footer className={styles.footer}>Kirat Calendar © {today.getFullYear()}</footer>
     </div>
