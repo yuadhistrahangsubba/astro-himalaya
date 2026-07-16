@@ -24,10 +24,17 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
     borderBottom: `1px solid ${LINE}`,
   },
-  fieldGrid: { flexDirection: "row", flexWrap: "wrap", border: `1px solid ${LINE}` },
-  field: { width: "33.33%", padding: 8, borderRight: `1px solid ${LINE}`, borderBottom: `1px solid ${LINE}` },
-  fieldLabel: { fontSize: 7, letterSpacing: 1, color: MUTED, textTransform: "uppercase", marginBottom: 2 },
-  fieldValue: { fontSize: 9.5, fontFamily: "Helvetica-Bold" },
+  headlineRow: { flexDirection: "row", gap: 8, marginBottom: 10 },
+  headlineCard: { flex: 1, border: `1px solid ${GOLD}`, borderRadius: 4, padding: 8, backgroundColor: "#fbf3e2" },
+  headlineLabel: { fontSize: 6.5, letterSpacing: 1, color: GOLD, textTransform: "uppercase", marginBottom: 3 },
+  headlineValue: { fontSize: 11, fontFamily: "Helvetica-Bold", color: INK },
+  headlineSub: { fontSize: 7, color: MUTED, marginTop: 2 },
+  groupsRow: { flexDirection: "row", gap: 10 },
+  groupCard: { flex: 1, border: `1px solid ${LINE}`, borderRadius: 4, padding: 10 },
+  groupTitle: { fontSize: 7.5, fontFamily: "Helvetica-Bold", color: MUTED, textTransform: "uppercase", letterSpacing: 1, marginBottom: 6 },
+  groupFieldRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 2.5 },
+  groupFieldLabel: { fontSize: 7.5, color: MUTED },
+  groupFieldValue: { fontSize: 8.5, fontFamily: "Helvetica-Bold", color: INK },
   chartsRow: { flexDirection: "row", gap: 24, marginTop: 4 },
   chartBlock: { flex: 1, alignItems: "center" },
   chartCaption: { fontSize: 8, letterSpacing: 1.5, color: MUTED, textTransform: "uppercase", marginTop: 6 },
@@ -68,31 +75,53 @@ export function KundliPdfDocument({
   const firstMahadasha = result.vimshottariDasha[0];
   const balance = result.dashaBalanceAtBirth;
 
-  const fields: Array<[string, string]> = [
-    ["Name", name],
-    ["Sex", gender === "male" ? "Male" : "Female"],
-    ["Date", formatDateInZone(birthUtc, timezone)],
-    ["Time of Birth", result.timeConfidence === "exact" ? formatTimeInZone(birthUtc, timezone) : "Unknown"],
-    ["Place", placeName],
-    ["Latitude", formatLatitude(latitude)],
-    ["Longitude", formatLongitude(longitude)],
-    ["Julian Day", String(Math.round(result.julianDayUtc))],
-    ["Ayanamsa", `${result.ayanamsaDegrees.toFixed(2)}°`],
-    ["Ayanamsa Type", result.ayanamsaName],
-    ...(result.siderealTimeDegrees !== undefined ? [["SID", degreesToClockTime(result.siderealTimeDegrees)] as [string, string]] : []),
-    ...(result.sunrise ? [["Sunrise", formatTimeInZone(result.sunrise, timezone)] as [string, string]] : []),
-    ...(result.sunset ? [["Sunset", formatTimeInZone(result.sunset, timezone)] as [string, string]] : []),
-    ["Tithi", result.panchang.tithi.name],
-    ["Yoga", result.panchang.yoga.name],
-    ["Karana", result.panchang.karana.name],
-    ...(asc ? ([["Ascendant", asc.rashi.signName], ["Asc Lord", ascLord(asc.rashi)]] as [string, string][]) : []),
-    ["Rasi", result.moon.rashi.signName],
-    ["Rasi Lord", rasiLord(result.moon.rashi)],
-    ["Star - Pada", `${result.moon.nakshatra.name} - ${result.moon.nakshatra.pada}`],
-    ["Star Lord", starLord(result.moon.nakshatra)],
+  const headline: Array<{ label: string; value: string; sub: string }> = [
+    ...(asc ? [{ label: "Ascendant", value: asc.rashi.signName, sub: `Lord ${ascLord(asc.rashi)}` }] : []),
+    { label: "Rasi", value: result.moon.rashi.signName, sub: `Lord ${rasiLord(result.moon.rashi)}` },
+    {
+      label: "Nakshatra",
+      value: `${result.moon.nakshatra.name} · Pada ${result.moon.nakshatra.pada}`,
+      sub: `Lord ${starLord(result.moon.nakshatra)}`,
+    },
     ...(firstMahadasha
-      ? ([["Bal. Dasha", `${firstMahadasha.planet}  ${balance.years}Y ${balance.months}M ${balance.days}D`]] as [string, string][])
+      ? [{ label: "Dasha Balance", value: firstMahadasha.planet, sub: `${balance.years}y ${balance.months}m ${balance.days}d left` }]
       : []),
+  ];
+
+  const fieldGroups: Array<{ title: string; fields: Array<[string, string]> }> = [
+    {
+      title: "Birth Details",
+      fields: [
+        ["Name", name],
+        ["Sex", gender === "male" ? "Male" : "Female"],
+        ["Date", formatDateInZone(birthUtc, timezone)],
+        ["Time of Birth", result.timeConfidence === "exact" ? formatTimeInZone(birthUtc, timezone) : "Unknown"],
+        ["Place", placeName],
+        ["Latitude", formatLatitude(latitude)],
+        ["Longitude", formatLongitude(longitude)],
+      ],
+    },
+    {
+      title: "Panchanga",
+      fields: [
+        ["Tithi", result.panchang.tithi.name],
+        ["Yoga", result.panchang.yoga.name],
+        ["Karana", result.panchang.karana.name],
+        ...(result.sunrise ? ([["Sunrise", formatTimeInZone(result.sunrise, timezone)]] as [string, string][]) : []),
+        ...(result.sunset ? ([["Sunset", formatTimeInZone(result.sunset, timezone)]] as [string, string][]) : []),
+      ],
+    },
+    {
+      title: "Chart Technicals",
+      fields: [
+        ["Julian Day", String(Math.round(result.julianDayUtc))],
+        ["Ayanamsa", `${result.ayanamsaDegrees.toFixed(2)}°`],
+        ["Ayanamsa Type", result.ayanamsaName],
+        ...(result.siderealTimeDegrees !== undefined
+          ? ([["Sidereal Time", degreesToClockTime(result.siderealTimeDegrees)]] as [string, string][])
+          : []),
+      ],
+    },
   ];
 
   return (
@@ -102,11 +131,25 @@ export function KundliPdfDocument({
         <Text style={styles.h1}>{name}&apos;s Kundli</Text>
 
         <Text style={styles.h2}>Traditional</Text>
-        <View style={styles.fieldGrid}>
-          {fields.map(([label, value]) => (
-            <View key={label} style={styles.field}>
-              <Text style={styles.fieldLabel}>{label}</Text>
-              <Text style={styles.fieldValue}>{value}</Text>
+        <View style={styles.headlineRow}>
+          {headline.map((stat) => (
+            <View key={stat.label} style={styles.headlineCard}>
+              <Text style={styles.headlineLabel}>{stat.label}</Text>
+              <Text style={styles.headlineValue}>{stat.value}</Text>
+              <Text style={styles.headlineSub}>{stat.sub}</Text>
+            </View>
+          ))}
+        </View>
+        <View style={styles.groupsRow}>
+          {fieldGroups.map((group) => (
+            <View key={group.title} style={styles.groupCard}>
+              <Text style={styles.groupTitle}>{group.title}</Text>
+              {group.fields.map(([label, value]) => (
+                <View key={label} style={styles.groupFieldRow}>
+                  <Text style={styles.groupFieldLabel}>{label}</Text>
+                  <Text style={styles.groupFieldValue}>{value}</Text>
+                </View>
+              ))}
             </View>
           ))}
         </View>
