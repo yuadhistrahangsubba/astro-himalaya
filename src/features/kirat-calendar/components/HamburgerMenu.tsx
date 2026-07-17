@@ -2,7 +2,6 @@
 
 import { Sparkles, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import Image from "next/image";
 import Link from "next/link";
 
 import { PrayerFlagAccent } from "@/components/marketing/prayer-flag-accent";
@@ -20,17 +19,14 @@ interface HamburgerMenuProps {
   onSelectInfoPage?: (key: InfoPageKey) => void;
 }
 
-const BANNER_IMAGE =
-  "https://images.unsplash.com/photo-1690122644787-d20b6c6b51b9?auto=format&fit=crop&w=800&q=80";
-
 const LIST_STAGGER = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.04, delayChildren: 0.1 } },
+  visible: { transition: { staggerChildren: 0.035, delayChildren: 0.12 } },
 };
 
 const ITEM_RISE = {
-  hidden: { opacity: 0, x: -10 },
-  visible: { opacity: 1, x: 0, transition: { type: "spring" as const, stiffness: 260, damping: 24 } },
+  hidden: { opacity: 0, x: 14 },
+  visible: { opacity: 1, x: 0, transition: { type: "spring" as const, stiffness: 280, damping: 26 } },
 };
 
 export function HamburgerMenu({ open, onClose, onSelectHome, onSelectInfoPage }: HamburgerMenuProps) {
@@ -47,53 +43,57 @@ export function HamburgerMenu({ open, onClose, onSelectHome, onSelectInfoPage }:
             transition={{ duration: 0.2 }}
             onClick={onClose}
           />
+          {/* Slides from the right, under the "Menu" trigger it opens from —
+              the old left-sliding panel opened on the opposite side of the
+              screen from its own button, which reads as a small but real
+              spatial disconnect once you notice it. */}
           <motion.div
-            initial={{ x: "-100%" }}
+            initial={{ x: "100%" }}
             animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ type: "spring", stiffness: 340, damping: 32 }}
-            className="fixed inset-y-0 left-0 z-[99999] flex w-[85vw] max-w-[320px] flex-col overflow-y-auto border-r border-border/60 bg-card/95 backdrop-blur-2xl shadow-[12px_0_50px_-12px_rgba(0,0,0,.45)]"
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", stiffness: 320, damping: 34 }}
+            className="fixed inset-y-0 right-0 z-[99999] flex w-[85vw] max-w-[400px] flex-col overflow-hidden border-l border-border/60 bg-card/97 backdrop-blur-2xl shadow-[-12px_0_50px_-12px_rgba(0,0,0,.45)]"
           >
-            <div className="relative h-32 w-full shrink-0 overflow-hidden">
-              <Image src={BANNER_IMAGE} alt="" fill sizes="320px" className="object-cover" priority />
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-black/10"
-              />
+            {/* An oversized, low-opacity glyph standing in for a stock photo
+                banner — the same quiet-depth trick as the hero, sized to the
+                drawer instead. */}
+            <span
+              aria-hidden="true"
+              lang="dz"
+              className="pointer-events-none absolute -top-8 -right-12 font-dzongkha text-[16rem] leading-none text-gold/[0.05] select-none"
+            >
+              སྐར
+            </span>
+
+            <div className="relative flex items-start justify-between gap-3 px-6 pt-7 pb-5">
+              <div className="min-w-0">
+                <span className="font-sans text-xl font-bold tracking-wide">Kirat Astro</span>
+                <p className="mt-1 text-xs text-muted-foreground">Vedic Astrology &amp; Kirat Calendar</p>
+                <PrayerFlagAccent className="mt-3 max-w-[140px] opacity-70" />
+              </div>
               <button
                 onClick={onClose}
                 aria-label="Close menu"
-                className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full border border-white/25 bg-black/30 text-white backdrop-blur-md transition-colors hover:bg-black/45"
+                className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-muted/40 text-foreground/80 transition-colors hover:border-gold/40 hover:text-gold"
               >
                 <X className="size-4" aria-hidden="true" />
               </button>
-            </div>
-
-            <div className="px-5 pt-3 pb-1">
-              <div className="flex items-center justify-between">
-                <span className="font-sans text-lg font-bold tracking-wide">Kirat Astro</span>
-                <span lang="dz" className="font-dzongkha text-sm text-gold/70">
-                  སྐར་རྩིས
-                </span>
-              </div>
-              <p className="mt-0.5 text-xs text-muted-foreground">Vedic Astrology &amp; Kirat Calendar</p>
-              <PrayerFlagAccent className="mt-3 opacity-70" />
             </div>
 
             <motion.nav
               initial="hidden"
               animate="visible"
               variants={LIST_STAGGER}
-              className="flex-1 px-3 py-3"
+              className="relative flex-1 overflow-y-auto px-4 py-2"
             >
               {NAV_SECTIONS.map((section, i) => (
-                <div key={section.label ?? `section-${i}`} className={cn(i > 0 && "mt-4")}>
+                <div key={section.label ?? `section-${i}`} className={cn(i > 0 && "mt-5")}>
                   {section.label && (
-                    <p className="px-3 pb-1.5 font-dense text-[10px] tracking-[0.18em] text-muted-foreground/70 uppercase">
+                    <p className="px-3.5 pb-2 font-dense text-[10px] tracking-[0.18em] text-muted-foreground/70 uppercase">
                       {section.label}
                     </p>
                   )}
-                  <div className="flex flex-col gap-0.5">
+                  <div className="flex flex-col gap-1">
                     {section.items.map((item) => (
                       <NavRow
                         key={item.label}
@@ -108,7 +108,7 @@ export function HamburgerMenu({ open, onClose, onSelectHome, onSelectInfoPage }:
               ))}
             </motion.nav>
 
-            <div className="border-t border-border/60 p-4">
+            <div className="relative border-t border-border/60 bg-card/60 p-4">
               <Button asChild breathing className="w-full">
                 <Link href="/astro" onClick={onClose}>
                   <Sparkles className="size-4" aria-hidden="true" />
@@ -136,7 +136,7 @@ function NavRow({
 }) {
   const Icon = item.icon;
   const rowClassName =
-    "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground/90 transition-colors hover:bg-gold/10 hover:text-foreground";
+    "group flex items-center gap-3 rounded-xl px-3.5 py-3 text-[15px] font-medium text-foreground/90 transition-all duration-200 hover:translate-x-1 hover:bg-gold/10 hover:text-foreground";
   const iconWrapClassName =
     "flex size-8 shrink-0 items-center justify-center rounded-full border border-border/60 bg-muted/40 text-muted-foreground transition-colors group-hover:border-gold/40 group-hover:text-gold";
 

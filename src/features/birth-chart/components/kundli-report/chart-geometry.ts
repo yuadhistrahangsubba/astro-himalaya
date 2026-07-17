@@ -23,9 +23,25 @@ const GRAHA_ABBR = {
 
 const GRAHA_ORDER = Object.keys(GRAHA_ABBR) as (keyof typeof GRAHA_ABBR)[];
 
-/** Every classical graha plus the outer planets, abbreviated and placed by rashi — shared by the Lagna chart, the Navamsa chart, and the PDF export. */
+/**
+ * Every classical graha plus the outer planets, abbreviated and placed by
+ * rashi — shared by the Lagna chart and the PDF export. Retrograde bodies
+ * get a trailing "R" (e.g. "Ma R"), the convention printed on ephemeris
+ * tables elsewhere. Rahu/Ketu are deliberately excluded from the marker
+ * even though `result.rahu.retrograde`/`result.ketu.retrograde` are
+ * always `true` — the mean node always regresses, so the flag carries no
+ * chart-specific information for them, and this diamond chart's boxes are
+ * cramped enough already without a permanently-redundant "R". The Navamsa
+ * chart below omits the marker entirely — retrograde describes real-time
+ * motion, not something the D9 division itself carries.
+ */
+const RETROGRADE_ELIGIBLE = new Set<keyof typeof GRAHA_ABBR>(["mars", "mercury", "jupiter", "venus", "saturn", "uranus", "neptune", "pluto"]);
+
 export function lagnaPlacements(result: ChartResult): ChartPlacement[] {
-  return GRAHA_ORDER.map((body) => ({ abbreviation: GRAHA_ABBR[body], signIndex: result[body].rashi.signIndex }));
+  return GRAHA_ORDER.map((body) => ({
+    abbreviation: RETROGRADE_ELIGIBLE.has(body) && result[body].retrograde ? `${GRAHA_ABBR[body]} R` : GRAHA_ABBR[body],
+    signIndex: result[body].rashi.signIndex,
+  }));
 }
 
 export function navamsaPlacements(result: ChartResult): ChartPlacement[] {

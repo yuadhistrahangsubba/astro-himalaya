@@ -6,7 +6,9 @@
  * month title banner (`.monthTitle` in kirat-calendar.module.css) already
  * uses, so the page's own "topic" reads as part of the same visual
  * language as the calendar beneath it. Flows normally with the page (not
- * fixed/sticky), same as the header above it.
+ * fixed/sticky), same as the header above it. Deliberately just the
+ * title — today's date/time/place lives in its own separate `TodayInfoBar`
+ * card below, not merged into this banner.
  */
 export function PageTopicHeader() {
   return (

@@ -9,6 +9,21 @@ export function normalizeDegrees(degrees: number): number {
   return wrapped;
 }
 
+/**
+ * Signed angular difference `to - from`, wrapped into [-180, 180) — unlike
+ * plain subtraction, this always reports the *shorter* way around the
+ * circle, with the sign telling you which direction that is. Used to
+ * detect real forward/backward motion (e.g. retrograde) across the
+ * 359°→0° wrap, where a naive `to - from` would spuriously read as a
+ * huge negative or positive jump instead of a small step. An exact
+ * half-circle (180°) apart resolves to -180, not +180 — a real but
+ * inconsequential boundary choice, since no body this is used for ever
+ * moves anywhere near 180° between samples.
+ */
+export function signedAngularDelta(from: number, to: number): number {
+  return normalizeDegrees(to - from + 180) - 180;
+}
+
 export function toRadians(degrees: number): number {
   return (degrees * Math.PI) / 180;
 }

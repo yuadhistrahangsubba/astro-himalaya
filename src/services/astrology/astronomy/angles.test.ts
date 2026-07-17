@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { normalizeDegrees, signFromLongitude, toDegrees, toRadians } from "./angles";
+import { normalizeDegrees, signedAngularDelta, signFromLongitude, toDegrees, toRadians } from "./angles";
 
 describe("normalizeDegrees", () => {
   it("leaves in-range values unchanged", () => {
@@ -32,6 +32,28 @@ describe("toRadians / toDegrees", () => {
 
   it("180 degrees is pi radians", () => {
     expect(toRadians(180)).toBeCloseTo(Math.PI, 10);
+  });
+});
+
+describe("signedAngularDelta", () => {
+  it("reports simple forward motion as positive", () => {
+    expect(signedAngularDelta(10, 15)).toBeCloseTo(5, 10);
+  });
+
+  it("reports simple backward motion as negative", () => {
+    expect(signedAngularDelta(15, 10)).toBeCloseTo(-5, 10);
+  });
+
+  it("takes the shorter way around across the 359->0 wrap, forward", () => {
+    expect(signedAngularDelta(359, 1)).toBeCloseTo(2, 10);
+  });
+
+  it("takes the shorter way around across the 0->359 wrap, backward", () => {
+    expect(signedAngularDelta(1, 359)).toBeCloseTo(-2, 10);
+  });
+
+  it("a half-circle delta resolves to exactly -180 (the [-180, 180) boundary choice)", () => {
+    expect(signedAngularDelta(0, 180)).toBe(-180);
   });
 });
 

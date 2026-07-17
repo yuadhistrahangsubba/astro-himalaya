@@ -11,6 +11,7 @@ import { lahiriAyanamsa } from "./ayanamsa/lahiri";
 import { assessBoundaryConfidence } from "./confidence";
 import { meanLunarNodeLongitude, meanLunarSouthNodeLongitude } from "./ephemeris/lunar-node";
 import { MeeusEphemerisProvider } from "./ephemeris/provider";
+import { isRetrograde } from "./ephemeris/retrograde";
 import type { CelestialBody } from "./ephemeris/types";
 import { calculateMoonPhase } from "./moon-phase";
 import { CLASSICAL_GRAHAS, type ClassicalGraha } from "./vedic/dignity";
@@ -79,21 +80,32 @@ export function computeChart(input: BirthInput): ChartResult {
     vedicCusps = houses.vedic.cusps;
   }
 
-  const place = (tropicalLongitude: number) => placeBody(tropicalLongitude, ayanamsaDegrees, vedicCusps);
+  const place = (tropicalLongitude: number, retrograde?: boolean) =>
+    placeBody(tropicalLongitude, ayanamsaDegrees, vedicCusps, retrograde);
+  const placeMoving = (body: CelestialBody) =>
+    place(ephemeris.getPosition(body, julianDayUtc).longitudeDegrees, isRetrograde(ephemeris, body, julianDayUtc));
 
-  const sun = place(ephemeris.getPosition("sun", julianDayUtc).longitudeDegrees);
-  const moon = place(ephemeris.getPosition("moon", julianDayUtc).longitudeDegrees);
+  const sun = place(ephemeris.getPosition("sun", julianDayUtc).longitudeDegrees, false);
+  const moon = place(ephemeris.getPosition("moon", julianDayUtc).longitudeDegrees, false);
 
-  const [mars, mercury, jupiter, venus, saturn] = GRAHA_BODIES.map((body) =>
-    place(ephemeris.getPosition(body, julianDayUtc).longitudeDegrees),
-  ) as [ReturnType<typeof place>, ReturnType<typeof place>, ReturnType<typeof place>, ReturnType<typeof place>, ReturnType<typeof place>];
+  const [mars, mercury, jupiter, venus, saturn] = GRAHA_BODIES.map(placeMoving) as [
+    ReturnType<typeof place>,
+    ReturnType<typeof place>,
+    ReturnType<typeof place>,
+    ReturnType<typeof place>,
+    ReturnType<typeof place>,
+  ];
 
-  const [uranus, neptune, pluto] = OUTER_ONLY_BODIES.map((body) =>
-    place(ephemeris.getPosition(body, julianDayUtc).longitudeDegrees),
-  ) as [ReturnType<typeof place>, ReturnType<typeof place>, ReturnType<typeof place>];
+  const [uranus, neptune, pluto] = OUTER_ONLY_BODIES.map(placeMoving) as [
+    ReturnType<typeof place>,
+    ReturnType<typeof place>,
+    ReturnType<typeof place>,
+  ];
 
-  const rahu = place(meanLunarNodeLongitude(julianDayUtc));
-  const ketu = place(meanLunarSouthNodeLongitude(julianDayUtc));
+  // The mean lunar node regresses by construction, not by sampled motion —
+  // always retrograde, never computed via isRetrograde (see BodyPlacement's doc).
+  const rahu = place(meanLunarNodeLongitude(julianDayUtc), true);
+  const ketu = place(meanLunarSouthNodeLongitude(julianDayUtc), true);
 
   const grahas: Grahas<(typeof sun)> = { sun, moon, mars, mercury, jupiter, venus, saturn, rahu, ketu };
 

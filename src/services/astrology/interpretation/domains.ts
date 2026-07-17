@@ -25,11 +25,17 @@ interface Placement {
   houseNumber?: number;
   sign: string;
   signIndex: number;
+  degreesInSign: number;
 }
 
 function placementOf(result: ChartResult, planet: DashaPlanet): Placement {
   const body = result[GRAHA_KEY[planet]];
-  return { houseNumber: body.house, sign: body.rashi.signName, signIndex: body.rashi.signIndex };
+  return {
+    houseNumber: body.house,
+    sign: body.rashi.signName,
+    signIndex: body.rashi.signIndex,
+    degreesInSign: body.rashi.degreesInSign,
+  };
 }
 
 /** Every placed graha's whole-sign house, keyed by planet — the input `calculateNatalAspects` needs to compute who-aspects-what for a whole chart at once. */
@@ -60,10 +66,11 @@ function describePlacement(
   planet: DashaPlanet,
   signName: string,
   signIndex: number,
+  degreesInSign: number,
   house: number | undefined,
   aspects: readonly NatalAspect[],
 ): string {
-  const dignityPhrase = DIGNITY_PHRASE[classifyDignity(planet, signIndex)];
+  const dignityPhrase = DIGNITY_PHRASE[classifyDignity(planet, signIndex, degreesInSign)];
   const houseClause = house ? `, sitting in your ${ordinal(house)} house` : "";
   const aspectingPlanets = house ? planetsAspecting(aspects, house) : [];
   const aspectClause = aspectingPlanets.length > 0 ? `, aspected by ${formatPlanetList(aspectingPlanets)}` : "";
@@ -95,7 +102,8 @@ export function interpretDomain(
   const flavor = FLAVOR_TEXT[config.key][flavorSign] ?? "";
 
   if (ascendantSignIndex === undefined) {
-    const moonDignityPhrase = DIGNITY_PHRASE[classifyDignity("Moon", result.moon.rashi.signIndex)];
+    const moonDignityPhrase =
+      DIGNITY_PHRASE[classifyDignity("Moon", result.moon.rashi.signIndex, result.moon.rashi.degreesInSign)];
     const summary =
       `${config.title} ${config.framingVerb}. Your exact birth time isn't set, so this reading leans on ` +
       `your Moon sign, ${result.moon.rashi.signName} — currently ${moonDignityPhrase} — rather than house placements.`;
@@ -113,9 +121,9 @@ export function interpretDomain(
   }
 
   if (config.planet) {
-    const { houseNumber, sign, signIndex } = placementOf(result, config.planet);
+    const { houseNumber, sign, signIndex, degreesInSign } = placementOf(result, config.planet);
     const strength: HouseStrength = houseNumber ? classifyHouseStrength(houseNumber) : "supportive";
-    const placementDescription = describePlacement(config.planet, sign, signIndex, houseNumber, resolvedAspects);
+    const placementDescription = describePlacement(config.planet, sign, signIndex, degreesInSign, houseNumber, resolvedAspects);
     const strengthClause = houseNumber ? ` — ${STRENGTH_PHRASES[strength]}` : "";
     const summary = `${config.planet} ${config.framingVerb}. It's ${placementDescription}${strengthClause}.`;
     return {
@@ -136,9 +144,14 @@ export function interpretDomain(
   const houseSignIndex = (ascendantSignIndex + houseNumber - 1) % 12;
   const houseSign = SIGN_NAMES[houseSignIndex]!;
   const lord = rasiLordBySignIndex(houseSignIndex);
-  const { houseNumber: lordHouse, sign: lordSign, signIndex: lordSignIndex } = placementOf(result, lord);
+  const {
+    houseNumber: lordHouse,
+    sign: lordSign,
+    signIndex: lordSignIndex,
+    degreesInSign: lordDegreesInSign,
+  } = placementOf(result, lord);
   const strength: HouseStrength = lordHouse ? classifyHouseStrength(lordHouse) : "supportive";
-  const placementDescription = describePlacement(lord, lordSign, lordSignIndex, lordHouse, resolvedAspects);
+  const placementDescription = describePlacement(lord, lordSign, lordSignIndex, lordDegreesInSign, lordHouse, resolvedAspects);
   const summary =
     `Your ${ordinal(houseNumber)} house (${houseSign}) ${config.framingVerb}. ` +
     `It's ruled by ${lord}, who is ${placementDescription} — ${STRENGTH_PHRASES[strength]}.`;

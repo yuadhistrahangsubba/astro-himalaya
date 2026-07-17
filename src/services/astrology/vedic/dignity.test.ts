@@ -47,6 +47,33 @@ describe("classifyDignity", () => {
     expect(classifyDignity("Ketu", 4)).toBe("neutral");
   });
 
+  it("recognizes Moolatrikona only when degreesInSign is supplied and within range", () => {
+    expect(classifyDignity("Sun", 4, 10)).toBe("moolatrikona"); // Leo 10°
+    expect(classifyDignity("Mars", 0, 5)).toBe("moolatrikona"); // Aries 5°
+    expect(classifyDignity("Jupiter", 8, 0)).toBe("moolatrikona"); // Sagittarius 0°
+    expect(classifyDignity("Venus", 6, 14.9)).toBe("moolatrikona"); // Libra 14.9°
+    expect(classifyDignity("Saturn", 10, 19.9)).toBe("moolatrikona"); // Aquarius 19.9°
+  });
+
+  it("falls back to plain own-sign when degreesInSign is outside the Moolatrikona sub-range", () => {
+    expect(classifyDignity("Sun", 4, 25)).toBe("own"); // Leo 25° — past the 0-20° MT zone
+    expect(classifyDignity("Mars", 0, 20)).toBe("own"); // Aries 20° — past the 0-12° MT zone
+  });
+
+  it("omitting degreesInSign never reports Moolatrikona, matching pre-existing sign-level behavior", () => {
+    expect(classifyDignity("Sun", 4)).toBe("own"); // Leo, no degree given
+    expect(classifyDignity("Mars", 0)).toBe("own"); // Aries, no degree given
+  });
+
+  it("Moon's Moolatrikona sign (Taurus) coincides with its exaltation sign, so exaltation — checked first, as the stronger of two simultaneously-true dignities — shadows it everywhere in the sign, the same coincidence classifyDignity already resolves for Mercury/Virgo", () => {
+    expect(classifyDignity("Moon", 1, 10)).toBe("exalted"); // Taurus 10° — still exaltation-sign, not "moolatrikona"
+    expect(classifyDignity("Moon", 3, 10)).toBe("own"); // Cancer 10° — Moon's actual own sign, no Moolatrikona there
+  });
+
+  it("Mercury's Moolatrikona sign (Virgo) coincides with its exaltation sign for the same reason", () => {
+    expect(classifyDignity("Mercury", 5, 16)).toBe("exalted"); // Virgo 16° — still exaltation-sign, not "moolatrikona"
+  });
+
   it("debilitationOf is always exactly 6 signs from EXALTATION", () => {
     for (const planet of Object.keys(EXALTATION) as (keyof typeof EXALTATION)[]) {
       const exaltedSign = EXALTATION[planet].signIndex;

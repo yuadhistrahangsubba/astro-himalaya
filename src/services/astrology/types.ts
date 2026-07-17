@@ -32,6 +32,14 @@ export interface BodyPlacement {
   westernSign: WesternSignPlacement;
   /** 1-12, whole-sign Vedic house from the Ascendant. Only present when `timeConfidence` is "exact". */
   house?: number;
+  /**
+   * Apparent backward motion at this moment. Always `false` for Sun/Moon
+   * (never applicable) and always `true` for Rahu/Ketu (the mean lunar
+   * node regresses by construction, not by sampled motion) — computed
+   * only for Mars through Pluto. Omitted entirely from `SkySnapshot`,
+   * which only ever places Sun/Moon.
+   */
+  retrograde?: boolean;
 }
 
 export interface AscendantPlacement {

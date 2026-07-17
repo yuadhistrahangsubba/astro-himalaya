@@ -8,8 +8,9 @@ import { FormProvider, useForm } from "react-hook-form";
 
 import { PrayerFlagAccent } from "@/components/marketing/prayer-flag-accent";
 import { Button } from "@/components/ui/button";
-import { computeChart, type ChartResult } from "@/services/astrology";
+import type { ChartResult } from "@/services/astrology";
 
+import { computeChartAction } from "../actions";
 import { birthChartSchema, toBirthInput, type BirthChartFormValues } from "../schema";
 import { useBirthChartWizard } from "../store";
 import { BirthDateTimeFields } from "./birth-datetime-fields";
@@ -92,28 +93,30 @@ export function BirthChartForm({ onResult }: BirthChartFormProps) {
     setValue("second", now.getSeconds(), { shouldValidate: true });
   }
 
-  function onSubmit(values: BirthChartFormValues) {
+  async function onSubmit(values: BirthChartFormValues) {
     setDraft(values);
     setEngineMessage(null);
     setResult(null);
     onResult?.(null);
-    try {
-      const computed = computeChart(toBirthInput(values));
-      setResult(computed);
-      onResult?.({
-        result: computed,
-        subject: {
-          name: values.name,
-          gender: values.gender,
-          placeName: values.placeName,
-          timezone: values.timezone!,
-          latitude: values.latitude!,
-          longitude: values.longitude!,
-        },
-      });
-    } catch (err) {
-      setEngineMessage(err instanceof Error ? err.message : "Something went wrong.");
+
+    const outcome = await computeChartAction(toBirthInput(values));
+    if (!outcome.ok) {
+      setEngineMessage(outcome.message);
+      return;
     }
+
+    setResult(outcome.result);
+    onResult?.({
+      result: outcome.result,
+      subject: {
+        name: values.name,
+        gender: values.gender,
+        placeName: values.placeName,
+        timezone: values.timezone!,
+        latitude: values.latitude!,
+        longitude: values.longitude!,
+      },
+    });
   }
 
   return (

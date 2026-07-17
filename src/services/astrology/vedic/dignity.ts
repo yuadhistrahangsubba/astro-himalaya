@@ -49,6 +49,46 @@ export function debilitationOf(planet: ClassicalGraha): { signIndex: number; deg
   return { signIndex: (exaltation.signIndex + 6) % 12, degree: exaltation.degree };
 }
 
+/**
+ * Moolatrikona: a sign-and-degree-range sub-zone stronger than plain
+ * own-sign placement, classically ranked just below exaltation. For every
+ * graha except the Moon it falls inside one of the planet's own signs
+ * (see `OWN_SIGNS`); the Moon is the one well-documented exception — its
+ * Moolatrikona (Taurus) sits in its *exaltation* sign extended out to 30°,
+ * not in Cancer, its actual own sign.
+ *
+ * CAVEAT: exact degree boundaries show a small (1-4°) spread across
+ * classical sources for a couple of these grahas (Moon's start point is
+ * sometimes cited as 3° rather than 4°; Mercury's as 15° rather than 16°).
+ * The ranges below are the commonly-cited BPHS-derived convention, not a
+ * bit-identical universal constant — the same caveat this package already
+ * gives the Lahiri ayanamsa (see ayanamsa/lahiri.ts).
+ *
+ * REACHABILITY NOTE: `classifyDignity` checks exaltation before
+ * Moolatrikona, and reports the whole exaltation *sign* as "exalted" —
+ * the same sign-level simplification (not degree-gated) it already uses
+ * everywhere else. Moon and Mercury's Moolatrikona signs (Taurus, Virgo)
+ * happen to coincide with their own exaltation signs, so for those two
+ * "exalted" always wins first and "moolatrikona" is unreachable — the
+ * same coincidence this file already documents and resolves in Mercury's
+ * favor for plain own-vs-exalted (see EXALTATION's doc comment). This is
+ * a real, expected consequence of that existing simplification, not a bug.
+ */
+export const MOOLATRIKONA: Record<ClassicalGraha, { signIndex: number; startDegree: number; endDegree: number }> = {
+  Sun: { signIndex: 4, startDegree: 0, endDegree: 20 }, // Leo 0-20°
+  Moon: { signIndex: 1, startDegree: 4, endDegree: 30 }, // Taurus 4-30° (exaltation sign, not own sign)
+  Mars: { signIndex: 0, startDegree: 0, endDegree: 12 }, // Aries 0-12°
+  Mercury: { signIndex: 5, startDegree: 16, endDegree: 20 }, // Virgo 16-20°
+  Jupiter: { signIndex: 8, startDegree: 0, endDegree: 10 }, // Sagittarius 0-10°
+  Venus: { signIndex: 6, startDegree: 0, endDegree: 15 }, // Libra 0-15°
+  Saturn: { signIndex: 10, startDegree: 0, endDegree: 20 }, // Aquarius 0-20°
+};
+
+function isInMoolatrikona(planet: ClassicalGraha, signIndex: number, degreesInSign: number): boolean {
+  const zone = MOOLATRIKONA[planet];
+  return zone.signIndex === signIndex && degreesInSign >= zone.startDegree && degreesInSign < zone.endDegree;
+}
+
 export type FriendshipGrade = "friend" | "enemy" | "neutral";
 
 /**
@@ -67,7 +107,7 @@ export const PERMANENT_FRIENDSHIP: Record<ClassicalGraha, Record<ClassicalGraha,
   Saturn: { Sun: "enemy", Moon: "enemy", Mars: "enemy", Mercury: "friend", Jupiter: "neutral", Venus: "friend", Saturn: "friend" },
 };
 
-export type PlanetDignity = "exalted" | "debilitated" | "own" | "friendly" | "enemy" | "neutral";
+export type PlanetDignity = "exalted" | "moolatrikona" | "debilitated" | "own" | "friendly" | "enemy" | "neutral";
 
 /**
  * Short narrative phrase per dignity, designed to slot into "It's
@@ -75,6 +115,7 @@ export type PlanetDignity = "exalted" | "debilitated" | "own" | "friendly" | "en
  */
 export const DIGNITY_PHRASE: Record<PlanetDignity, string> = {
   exalted: "exalted",
+  moolatrikona: "in its Moolatrikona",
   debilitated: "debilitated",
   own: "at home",
   friendly: "comfortably placed",
@@ -87,16 +128,22 @@ function isClassicalGraha(planet: DashaPlanet): planet is ClassicalGraha {
 }
 
 /**
- * A planet's sign-level dignity — exaltation/debilitation/own-sign checked
- * first (they override everything else), falling back to its Naisargika
- * friendship with the occupied sign's own lord. Returns "neutral" for
- * Rahu/Ketu (see ClassicalGraha's doc comment for why they're excluded
- * from real dignity classification) rather than guessing.
+ * A planet's dignity — exaltation, then Moolatrikona, then debilitation,
+ * then own-sign checked first (they override everything else), falling
+ * back to its Naisargika friendship with the occupied sign's own lord.
+ * Returns "neutral" for Rahu/Ketu (see ClassicalGraha's doc comment for
+ * why they're excluded from real dignity classification) rather than
+ * guessing.
+ *
+ * `degreesInSign` is optional and only needed to detect Moolatrikona —
+ * omit it (existing callers do) and this behaves exactly as before,
+ * classifying at the sign level only.
  */
-export function classifyDignity(planet: DashaPlanet, signIndex: number): PlanetDignity {
+export function classifyDignity(planet: DashaPlanet, signIndex: number, degreesInSign?: number): PlanetDignity {
   if (!isClassicalGraha(planet)) return "neutral";
 
   if (EXALTATION[planet].signIndex === signIndex) return "exalted";
+  if (degreesInSign !== undefined && isInMoolatrikona(planet, signIndex, degreesInSign)) return "moolatrikona";
   if (debilitationOf(planet).signIndex === signIndex) return "debilitated";
   if (OWN_SIGNS[planet].includes(signIndex)) return "own";
 

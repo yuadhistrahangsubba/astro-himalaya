@@ -89,6 +89,7 @@ export function TraditionalTable({
       icon: MoonStar,
       fields: [
         { label: "Tithi", value: result.panchang.tithi.name },
+        { label: "Vara", value: result.panchang.vara.name },
         { label: "Yoga", value: result.panchang.yoga.name },
         { label: "Karana", value: result.panchang.karana.name },
         ...(result.sunrise ? [{ label: "Sunrise", value: formatTimeInZone(result.sunrise, timezone) }] : []),
