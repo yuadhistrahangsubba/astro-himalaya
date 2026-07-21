@@ -14,10 +14,11 @@ interface CalendarHeaderProps {
 /**
  * A minimal, mostly-transparent bar — wordmark on the left, a single
  * text-only "Menu"/"Close" trigger on the right, no icon, no border, no
- * shadow. Kept narrower than full viewport width (unlike a hero-image
- * navbar) because this bar sits over a flat color, not a photo — pinning
- * the two ends to the screen edges would just leave a bare gap between
- * them instead of the intended airy minimalism.
+ * shadow. The content anchors to the screen edges (padding grows with the
+ * breakpoint) rather than floating in a fixed-width centered island, which
+ * on large monitors left a small block of content marooned in a wide empty
+ * bar. Edge-anchoring is the standard navbar read: the eye rests on both
+ * ends, so the open center is spaciousness, not emptiness.
  */
 export function CalendarHeader({ onSelectHome, onSelectInfoPage }: CalendarHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -30,8 +31,8 @@ export function CalendarHeader({ onSelectHome, onSelectInfoPage }: CalendarHeade
         transition={{ duration: 0.35, ease: "easeOut" }}
         className="relative z-[10000] bg-primary/80 py-4 backdrop-blur-xl"
       >
-        <div className="mx-auto flex max-w-4xl items-center justify-between px-5 sm:px-8">
-          <span className="font-sans text-base font-bold tracking-[0.03em] text-primary-foreground">
+        <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between px-5 sm:px-8 lg:px-12 xl:px-16">
+          <span className="font-sans text-lg font-bold tracking-[0.03em] text-primary-foreground sm:text-xl md:text-2xl">
             Kirat Astro
           </span>
 
@@ -49,7 +50,7 @@ export function CalendarHeader({ onSelectHome, onSelectInfoPage }: CalendarHeade
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 4 }}
                 transition={{ duration: 0.15 }}
-                className="inline-block font-dense text-xs font-semibold tracking-[0.25em] uppercase"
+                className="inline-block font-dense text-sm font-semibold tracking-[0.25em] uppercase sm:text-base"
               >
                 {menuOpen ? "Close" : "Menu"}
               </motion.span>
